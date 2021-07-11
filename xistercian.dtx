@@ -123,9 +123,9 @@ and the derived files           xistercian.pdf
 % doesn't parse the global options provided to the document class. Additionally
 % you can change the options (except for |debug|) using |\cisterciansetup|.
 %
-% For the options |width| and |height|, and probably also |stroke|, you should
-% use dimensions using |ex| or |em| to get sizes depending on the current font
-% size. For all three of those options the \meta{dimension expression} is
+% For the options |width| and |height|, and probably also the strokes, you
+% should use dimensions using |ex| or |em| to get sizes depending on the current
+% font size. For all three of those options the \meta{dimension expression} is
 % evaluated (using the setup specified in |font|) every time the font size
 % changed since the last time a Cistercian numeral should've been printed.
 %
@@ -143,7 +143,31 @@ and the derived files           xistercian.pdf
 %   Set the height of the Cistercian numeral digits.
 % \end{function}
 %
-% \begin{function}{stroke,s}
+% \begin{function}{stroke-v,sv}
+%   \begin{syntax}
+%     stroke-v = \marg{dimension expression} \mydefault{tv}
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{stroke-h,sh}
+%   \begin{syntax}
+%     stroke-h = \marg{dimension expression} \mydefault{th}
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{stroke-du,sdu}
+%   \begin{syntax}
+%     stroke-du = \marg{dimension expression} \mydefault{tdu}
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{stroke-dd,sdd}
+%   \begin{syntax}
+%     stroke-dd = \marg{dimension expression} \mydefault{tdd}
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{strokes,s}
 %   \begin{syntax}
 %     stroke = \marg{dimension expression} \mydefault{t}
 %   \end{syntax}
@@ -224,10 +248,10 @@ and the derived files           xistercian.pdf
 % There are variables stored as macros to be evaluated later, as well as
 % register types for faster access during the glyph drawing.
 %    \begin{macrocode}
-\newcommand*\xister@th{.1ex}
-\newcommand*\xister@tv{.1ex}
-\newcommand*\xister@tdu{.1ex}
-\newcommand*\xister@tdd{.1ex}
+\newcommand*\xister@th{.08ex}
+\newcommand*\xister@tv{.18ex}
+\newcommand*\xister@tdu{.08ex}
+\newcommand*\xister@tdd{.18ex}
 \newcommand*\xister@x{.4em}
 \newcommand*\xister@y{1.55ex}
 \newcommand*\xister@font{\normalfont}
@@ -465,8 +489,9 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \newcommand*\xister@clip[1]
   {%
-    \pgfpathrectanglecorners{\pgfpoint\z@{#1}}%
-                            {\pgfpoint\xister@X\xister@Y}%
+    \pgfpathrectanglecorners
+      {\pgfpoint{\dimexpr\ifdim\xister@X<\z@-\fi\xister@Tv\relax}{#1}}%
+      {\pgfpoint\xister@X\xister@Y}%
     \pgfusepath{clip}%
   }
 %    \end{macrocode}
@@ -497,24 +522,35 @@ and the derived files           xistercian.pdf
     \xister@drawdigit{3#1}%
       {%
         \xister@TMPA=\dimexpr\xister@Y/6\relax
+        \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdd\relax
         \xister@clip\xister@TMPA
         \pgfsetlinewidth{2\xister@Tdd}%
-        \pgfpathmoveto
-          {\pgfpoint{\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdd}%
-                    \xister@Y}%
+        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@TMPA}
+        \pgfpathlineto{\pgfpoint\xister@TMPB\xister@Y}
         \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
       }%
     \xister@drawdigit{4#1}%
       {%
         \xister@clip\z@
+        \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdu\relax
         \pgfsetlinewidth{2\xister@Tdu}%
-        \pgfpathmoveto{\pgfpoint\z@{\dimexpr\xister@Y/6\relax}}%
+        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
+        \pgfpathlineto{\pgfpoint\xister@TMPB{\dimexpr\xister@Y/6\relax}}%
         \pgfpathlineto{\pgfpoint\xister@X\xister@Y}%
       }%
-    \xister@superimpose{5#1}%
+    \xister@drawdigit{5#1}%
       {%
-        \rlap{\copy\csname xister@digitbox@1#1\endcsname}%
-        \copy\csname xister@digitbox@4#1\endcsname
+        \xister@clip\z@
+        \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdu\relax
+        \pgfsetlinewidth{2\xister@Tdu}%
+        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
+        \pgfpathlineto{\pgfpoint\xister@TMPB{\dimexpr\xister@Y/6\relax}}%
+        \pgfpathlineto{\pgfpoint\xister@X\xister@Y}%
+        \pgfusepath{stroke,clip}%
+        \pgfsetlinewidth{2\xister@Th}%
+        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@Th\relax
+        \pgfpathmoveto{\pgfpoint\z@\xister@TMPA}%
+        \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
       }%
     \xister@drawdigit{6#1}%
       {%
