@@ -1,0 +1,641 @@
+% \iffalse meta-comment
+%
+% File: xistercian.dtx Copyright (C) 2021 Jonathan P. Spratte
+%
+% This work  may be  distributed and/or  modified under  the conditions  of the
+% LaTeX Project Public License (LPPL),  either version 1.3c  of this license or
+% (at your option) any later version.  The latest version of this license is in
+% the file:
+%
+%   http://www.latex-project.org/lppl.txt
+%
+% ------------------------------------------------------------------------------
+%
+%<*driver>^^A>>=
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+\input l3docstrip.tex
+\askforoverwritefalse
+\preamble
+
+--------------------------------------------------------------
+xistercian -- Cistercian numerals in LaTeX
+E-mail: jspratte@yahoo.de
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+--------------------------------------------------------------
+
+Copyright (C) 2020-2021 Jonathan P. Spratte
+
+This  work may be  distributed and/or  modified under  the conditions  of the
+LaTeX Project Public License (LPPL),  either version 1.3c  of this license or
+(at your option) any later version.  The latest version of this license is in
+the file:
+
+  http://www.latex-project.org/lppl.txt
+
+This work is "maintained" (as per LPPL maintenance status) by
+  Jonathan P. Spratte.
+
+This work consists of the file  xistercian.dtx
+and the derived files           xistercian.pdf
+                                xistercian.sty
+
+\endpreamble
+% stop docstrip adding \endinput
+\postamble
+\endpostamble
+\generate{\file{xistercian.sty}{\from{xistercian.dtx}{pkg}}}
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
+%
+\IfFileExists{xistercian.sty}{\RequirePackage{xistercian}}{}
+\ProvidesFile{xistercian.dtx}[2021-07-10 v1.0.0 Cistercian numerals in LaTeX]
+\PassOptionsToPackage{full}{textcomp}
+\documentclass{l3doc}
+\RequirePackage[fulloldstyle,nott]{kpfonts}
+\RequirePackage{randtext}
+\input{glyphtounicode}
+\pdfgentounicode=1
+\makeatletter
+\@ifdefinable\gobbledocstriptag{\def\gobbledocstriptag#1>{}}
+\makeatother
+\let\metaORIG\meta
+\protected\def\meta#1{\texttt{\metaORIG{#1}}}
+\renewcommand*\thefootnote{\cistercian{footnote}}
+\newcommand*\cistexnum[1]
+  {^^A
+    \begingroup
+      \color{red!65!black}^^A
+      \cisterciansetup{s=.15ex}^^A
+      \printcistercian{#1}^^A
+    \endgroup
+  }
+\newcommand*\mydefault[1]
+  {^^A
+    \begingroup
+      \color{darkgray}^^A
+      \hfill initially:\@
+      \texttt
+        {^^A
+          \detokenize\expandafter\expandafter\expandafter
+            {\csname xister@#1\endcsname}^^A
+          \unskip
+        }^^A
+    \endgroup
+  }
+\pagenumbering{cistercian}
+\begin{document}
+  \title{The \pkg{xistercian} package}
+  \author{Jonathan P. Spratte\thanks{\protect\randomize{jspratte@yahoo.de}}}
+  \DocInput{xistercian.dtx}
+\end{document}
+%</driver>^^A=<<
+% \fi
+%
+% \maketitle
+% \tableofcontents
+%
+% \section{Documentation}
+%
+% The \pkg{xistercian} package provides Cistercian numerals for use in \LaTeX.
+% The name is chosen to be \pkg{xistercian} instead of \pkg{cistercian} because
+% as of writing this an unpublished package by that name already exists.
+%
+% Cistercian numerals are a system to denote the numbers from $1$ to $9999$ with
+% a single glyph. They use a stem denoting zero (\cistexnum{0}) and add the
+% digits to that using small tick marks, the place denoting the digits value. On
+% the upper right means units (\cistexnum{1}), upper left tens (\cistexnum{10}),
+% lower right hundreds (\cistexnum{100}), and lower left thousands
+% (\cistexnum{1000}).
+%
+% The glyphs created by this package all have the same bounding box 
+% 
+%
+% \subsection{Options}
+%
+% The options described here are all usable as package options. \pkg{xistercian}
+% doesn't parse the global options provided to the document class. Additionally
+% you can change the options (except for |debug|) using |\cisterciansetup|.
+%
+% For the options |width| and |height|, and probably also |stroke|, you should
+% use dimensions using |ex| or |em| to get sizes depending on the current font
+% size. For all three of those options the \meta{dimension expression} is
+% evaluated (using the setup specified in |font|) every time the font size
+% changed since the last time a Cistercian numeral should've been printed.
+%
+% \begin{function}{width,wd}
+%   \begin{syntax}
+%     width = \marg{dimension expression} \mydefault{x}
+%   \end{syntax}
+%   Set the width of the Cistercian numeral digits.
+% \end{function}
+%
+% \begin{function}{height,ht}
+%   \begin{syntax}
+%     height = \marg{dimension expression} \mydefault{y}
+%   \end{syntax}
+%   Set the height of the Cistercian numeral digits.
+% \end{function}
+%
+% \begin{function}{stroke,s}
+%   \begin{syntax}
+%     stroke = \marg{dimension expression} \mydefault{t}
+%   \end{syntax}
+%   Set the stroke width of the Cistercian numeral digits.
+% \end{function}
+%
+% \begin{function}{font}
+%   \begin{syntax}
+%     font = \marg{font setup} \mydefault{font}
+%   \end{syntax}
+%   Set the font which \pkg{xistercian} uses locally to evaluate the dimensions
+%   given to |width|, |height|, and |stroke|.
+% \end{function}
+%
+% \begin{function}{debug}
+%   \begin{syntax}
+%     debug
+%   \end{syntax}
+%   Only usable as a package option. If this is used a bit of debugging
+%   information is printed in the log file and terminal.
+% \end{function}
+%
+%
+% \subsection{Macros}
+%
+% \begin{function}{\cistercian}
+%   \begin{syntax}
+%     \cs{cistercian}\marg{counter}
+%   \end{syntax}
+%   Prints the value of the \LaTeXe\ \meta{counter} as a Cistercian numeral.
+% \end{function}
+%
+% \begin{function}{\printcistercian}
+%   \begin{syntax}
+%     \cs{printcistercian}\marg{integer}
+%   \end{syntax}
+%   Prints the \meta{integer} as a Cistercian numeral. The \meta{integer} has to
+%   be provided as a string containing only digits and an optional leading~|-|.
+% \end{function}
+%
+% \begin{function}{\Printcistercian}
+%   \begin{syntax}
+%     \cs{printcistercian}\marg{integer expression}
+%   \end{syntax}
+%   Evaluates the \meta{integer expression} and prints the result as a
+%   Cistercian numeral.
+% \end{function}
+%
+% \begin{function}{\cisterciansetup}
+%   \begin{syntax}
+%     \cs{cisterciansetup}\marg{key=value,\ldots}
+%   \end{syntax}
+%   Can be used to locally change the options after the package was loaded. The
+%   glyphs of the Cistercian numerals aren't updated just when you change the
+%   setup.
+% \end{function}
+%
+% \begin{function}{\cistercianredraw}
+%   \begin{syntax}
+%     \cs{cistercianredraw}
+%   \end{syntax}
+%   When this is used the glyphs 
+% \end{function}
+%
+%
+% \section{Implementation}
+%
+% First we load the required packages
+% \gobbledocstriptag
+%<*pkg>
+%    \begin{macrocode}
+\RequirePackage{pgf,expkv-opt}
+%    \end{macrocode}
+%
+%
+% \subsection{Variables}
+%
+% There are variables stored as macros to be evaluated later, as well as
+% register types for faster access during the glyph drawing.
+%    \begin{macrocode}
+\newcommand*\xister@t{.1ex}
+\newcommand*\xister@x{.4em}
+\newcommand*\xister@y{1.55ex}
+\newcommand*\xister@font{\normalfont}
+\newif\ifxister@debug@
+\newdimen\xister@X
+\newdimen\xister@Y
+\newdimen\xister@T
+\newdimen\xister@TMPA
+\newdimen\xister@TMPB
+%    \end{macrocode}
+%
+% We also need a bunch of box registers ($37$ of them to be precise). For the
+% loop we borrow an \pkg{expl3} function.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\int_step_inline:nn {9}
+  {
+    \expandafter\newsavebox\csname xister@digitbox@#1\endcsname
+    \expandafter\newsavebox\csname xister@digitbox@#10\endcsname
+    \expandafter\newsavebox\csname xister@digitbox@#100\endcsname
+    \expandafter\newsavebox\csname xister@digitbox@#1000\endcsname
+  }
+\ExplSyntaxOff
+\expandafter\newsavebox\csname xister@digitbox@0\endcsname
+%    \end{macrocode}
+%
+%
+% \subsection{Options}
+%
+% We define the keys
+%    \begin{macrocode}
+\ekvifdefinedset{xister}
+  {\PackageError{xistercian}{keyval conflict detected. Aborting}{}\endinput}{}
+\protected\long\ekvdef{xister}{width}{\edef\xister@x{\unexpanded{#1}}}
+\ekvletkv{xister}{wd}{xister}{width}
+\protected\long\ekvdef{xister}{height}{\edef\xister@y{\unexpanded{#1}}}
+\ekvletkv{xister}{ht}{xister}{height}
+\protected\long\ekvdef{xister}{stroke}{\edef\xister@t{\unexpanded{#1}}}
+\ekvletkv{xister}{s}{xister}{stroke}
+\ekvdefNoVal{xister}{debug}{\xister@debug@true}
+\protected\long\ekvdef{xister}{font}{\edef\xister@font{\unexpanded{#1}}}
+%    \end{macrocode}
+% and parse the package options (and since the used names |width|, |height|, and
+% |debug| are quite frequent we don't look at the global options).
+%    \begin{macrocode}
+\ekvoProcessLocalOptions{xister}
+%    \end{macrocode}
+%
+% The |debug| option is only available as a package option, we let it throw an
+% error:
+%    \begin{macrocode}
+\ekvdefNoVal{xister}{debug}
+  {\PackageError{xister}{`debug' is only available as a load time option}{}}
+%    \end{macrocode}
+%
+% \begin{macro}{\cisterciansetup}
+%   Just as a simple way to pick options later on.
+%    \begin{macrocode}
+\protected\ekvsetdef\cisterciansetup{xister}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{User macros}
+%
+% \begin{macro}{\cistercian}
+%   The macro is equivalent to other \LaTeX\ counter formatting macros, so we
+%   let it build the counter name and forward that to the canonically named
+%   auxiliary macro |\@cistercian|.
+%    \begin{macrocode}
+\newcommand\cistercian[1]
+  {%
+    \xister@texorpdf
+      {\expandafter\@cistercian}%
+      {C\expandafter\@arabic}%
+      \csname c@#1\endcsname
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\printcistercian}
+%    \begin{macrocode}
+\protected\def\printcistercian#1{\xister@a#1@}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\Printcistercian}
+%    \begin{macrocode}
+\newcommand\Printcistercian[1]
+  {\expandafter\printcistercian\expandafter{\the\numexpr#1\relax}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\cistercianredraw}
+%    \begin{macrocode}
+\protected\def\cistercianredraw
+  {%
+    \let\xister@last@font\@empty
+    \xister@ensure@current
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Parsing}
+%
+% \subsubsection{Small Auxiliaries}
+%
+% \begin{macro}[internal]
+%   {\xister@gobbletoat,\xister@gobbletozero,\xister@gobblecopy,\xister@done}
+%   These are just small functions gobbling some tokens.
+%    \begin{macrocode}
+\def\xister@gobbletoat#1@{}
+\def\xister@gobbletozero#10{}
+\def\xister@gobblecopy0\rlap#1{}
+\def\xister@done#1\xister@symbols@{}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@count,\xister@count@done}
+%   A simple loop to count tokens. The loop delimiter is a single |@|. Should be
+%   used after |\numexpr|.
+%    \begin{macrocode}
+\def\xister@count#1{\xister@gobbletoat#1\xister@count@done @+1\xister@count}
+\def\xister@count@done @+1\xister@count{\relax @}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\@cistercian}
+%   Just get the current value of a counter and forward it.
+%    \begin{macrocode}
+\newcommand\@cistercian[1]{\expandafter\printcistercian\expandafter{\the#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@texorpdf}
+%    \begin{macrocode}
+\let\xister@texorpdf\@firstoftwo
+\AddToHook{begindocument/before}
+  {%
+    \ifdefined\texorpdfstring
+      \let\xister@texorpdf\texorpdfstring
+    \fi
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsubsection{Input Parsing}
+%
+% \begin{macro}[internal]{\xister@a,\xister@b,\xister@c}
+%   First we have to make sure that we're in horizontal mode, else the |\rlap|s
+%   used to insert the glyphs will create havoc. We also need to ensure that the
+%   boxes contain the correct glyphs according to the current size and colour.
+%   After that we check whether we have to step over a minus sign and go to the
+%   next step.
+%    \begin{macrocode}
+\def\xister@a#1%
+  {%
+    \leavevmode
+    \xister@ensure@current
+    \ifx-#1-\expandafter\xister@b
+    \else\expandafter\xister@b\expandafter#1\fi
+  }
+%    \end{macrocode}
+%   Next we count the number of decimal digits in the number we want to print,
+%   take that modulo $4$ (that's what's |4*((#1-2)/4)| is doing, thanks to Heiko
+%   Oberdiek and the code in \pkg{expl3}), and use the correct symbol creating
+%   macro. The |@@@@| serves as the end marker since each step (except the
+%   first) will grab four digits.
+%    \begin{macrocode}
+\def\xister@b#1@%
+  {\expandafter\xister@c\the\numexpr\xister@count#1@#1@@@@}
+\def\xister@c#1@%
+  {\csname xister@symbols@\romannumeral\numexpr#1-4*((#1-2)/4)\relax\endcsname}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {\xister@symbols@,\xister@symbols@i,\xister@symbols@ii,\xister@symbols@iii}
+%   When this loop is done all arguments will be |@|, but we only check the
+%   first here. We generate the symbols by overlaying up to five boxes, one for
+%   each decade plus the zero stem. Each digit might be skipped if it is $0$.
+%   Next grab the next four digits.
+%    \begin{macrocode}
+\def\xister@symbols@#1%
+  {%
+    \protected\def\xister@symbols@##1##2##3##4%
+      {%
+        \xister@gobbletoat##1\xister@done @%
+        \xister@gobbletozero##1\xister@gobblecopy0%
+          \rlap{\copy\csname xister@digitbox@##1000\endcsname}%
+        \xister@gobbletozero##2\xister@gobblecopy0%
+          \rlap{\copy\csname xister@digitbox@##200\endcsname}%
+        \xister@gobbletozero##3\xister@gobblecopy0%
+          \rlap{\copy\csname xister@digitbox@##30\endcsname}%
+        \xister@gobbletozero##4\xister@gobblecopy0%
+          \rlap{\copy\csname xister@digitbox@##4\endcsname}%
+        \copy#1%
+        \xister@symbols@
+      }%
+  }
+\expandafter\xister@symbols@\csname xister@digitbox@0\endcsname
+%    \end{macrocode}
+%   If there are less than four decimal digits inside the first Cistercian
+%   numeral we provide enough zeros to fill up the remainder.
+%    \begin{macrocode}
+\def\xister@symbols@i{\xister@symbols@000}
+\def\xister@symbols@ii{\xister@symbols@00}
+\def\xister@symbols@iii{\xister@symbols@0}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Drawing the Digits}
+%
+% \begin{macro}[internal]{\xister@clip}
+%   Some of the digit glyphs need a bit of clipping to look nice. Let's define a
+%   small auxiliary to select a clipping region.
+%    \begin{macrocode}
+\newcommand*\xister@clip[1]
+  {%
+    \pgfpathrectanglecorners{\pgfpoint{\z@}{#1}}%
+                            {\pgfpoint{\xister@X}{\xister@Y}}%
+    \pgfusepath{clip}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@drawdigits,\xister@drawdigit}
+%   The digit glyphs. Since each numeral is build from the zero stem and some
+%   appendix to it this only specifies the form of the appendices. The zero stem
+%   is defined a bit down the road. |#1| will determine the decade, and |#2|
+%   will be either~|-| or empty.
+%    \begin{macrocode}
+\newcommand\xister@drawdigits[2]
+  {%
+    \xister@drawdigit{1#1}%
+      {%
+        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
+        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+      }%
+    \xister@drawdigit{2#1}%
+      {%
+        \xister@TMPA=\dimexpr\xister@Y/6+#2\xister@T\relax
+        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+      }%
+    \xister@drawdigit{3#1}%
+      {%
+        \xister@TMPA=\dimexpr\xister@Y/6\relax
+        \xister@clip\xister@TMPA
+        \pgfpathmoveto{\pgfpoint{\z@}{\xister@Y}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+      }%
+    \xister@drawdigit{4#1}%
+      {%
+        \xister@clip\z@
+        \pgfpathmoveto{\pgfpoint{\z@}{\dimexpr\xister@Y/6\relax}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@Y}}%
+      }%
+    \xister@drawdigit{5#1}%
+      {%
+        \xister@clip\z@
+        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
+        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\z@}{\dimexpr\xister@Y/6\relax}}%
+      }%
+    \xister@drawdigit{6#1}%
+      {%
+        \pgfpathmoveto{\pgfpoint{\xister@X}{\xister@Y}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\dimexpr\xister@Y/6\relax}}%
+      }%
+    \xister@drawdigit{7#1}%
+      {%
+        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
+        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\dimexpr\xister@Y/6\relax}}%
+      }%
+    \xister@drawdigit{8#1}%
+      {%
+        \xister@TMPA=\dimexpr\xister@Y/6+#2\xister@T\relax
+        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@Y}}%
+      }%
+    \xister@drawdigit{9#1}%
+      {%
+        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
+        \xister@TMPB=\dimexpr\xister@Y/6+#2\xister@T\relax
+        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPB}}%
+        \pgfpathlineto{\pgfpoint{\z@}{\xister@TMPB}}%
+      }%
+  }
+%    \end{macrocode}
+%   Each digit has the same bounding box and baseline which is specified here.
+%   Also, the stroke width is set equal for each of the digits. |#1| will be the
+%   name, |#2| the digit specific path.
+%    \begin{macrocode}
+\newcommand\xister@drawdigit[2]
+  {%
+    \expandafter\setbox\csname xister@digitbox@#1\endcsname=\hbox
+      {%
+        \begin{pgfpicture}%
+          \pgfpathrectanglecorners
+            {\pgfpoint{-1.2\xister@X}{-1.2\xister@Y}}%
+            {\pgfpoint{1.2\xister@X}{1.2\xister@Y}}%
+          \pgfusepath{use as bounding box}%
+          \pgfsetlinewidth{2\xister@T}%
+          #2%
+          \pgfusepath{stroke}%
+          \pgfsetbaseline{\xister@sgn\xister@Y}%
+        \end{pgfpicture}%
+      }%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Rebuild the Glyphs}
+%
+% \begin{macro}[internal]{\xister@setlengths}
+%   Lengths are set depending on the current font size and the sizes of
+%   |\xister@font|. To keep the font changes local they are kept inside a group
+%   and a chain of |\expandafter|s is used to evaluate the user specified sizes
+%   while the |\xister@font| is still active.
+%    \begin{macrocode}
+\protected\def\xister@setlengths
+  {%
+    \begingroup
+      \xister@font
+      \expandafter
+    \endgroup
+    \expandafter\xister@X\the\dimexpr.5\dimexpr\xister@x\relax\expandafter\relax
+    \expandafter\xister@Y\the\dimexpr.5\dimexpr\xister@y\relax\expandafter\relax
+    \expandafter\xister@T\the\dimexpr.5\dimexpr\xister@t\relax\relax
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@build}
+%   First we set the length registers to the correct size, than we draw the
+%   glyphs batch wise. We have to flip the $x$-direction for the tenths and
+%   thousands, and the $y$-direction for the hundreds and thousands. The macro
+%   |\xister@sgn| is used to set the baseline in the correct direction.
+%    \begin{macrocode}
+\protected\def\xister@build
+  {%
+    \xister@setlengths
+    \def\xister@sgn{-}%
+    \xister@drawdigit{0}%
+      {%
+        \pgfpathmoveto{\pgfpoint{\z@}{-\xister@Y}}%
+        \pgfpathlineto{\pgfpoint{\z@}{\xister@Y}}%
+      }%
+    \xister@drawdigits{}{}%
+    \xister@X=-\xister@X
+    \xister@drawdigits{0}{}%
+    \def\xister@sgn{+}%
+    \xister@Y=-\xister@Y
+    \xister@drawdigits{000}{-}%
+    \xister@X=-\xister@X
+    \xister@drawdigits{00}{-}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@ensure@current}
+%   The glyphs have to be rebuilt if the font size or colour changed. The latter
+%   is an annoyance because we can build boxes in a way that they change colour
+%   to the surrounding colour, but \pkg{PGF} is too intelligent here and does
+%   issue the corresponding |\special|s to save the current colour for the box.
+%   Because of that we test which |\f@size| and colour (using |\\color@.|) was
+%   active when we last built the glyphs. If this matches we do nothing, else we
+%   rebuild the glyphs.
+%
+%   The |\edef| is just used to remove the |debug| code if it isn't necessary.
+%    \begin{macrocode}
+\protected\edef\xister@ensure@current
+  {%
+    \unexpanded{\edef\xister@tmp}%
+      {%
+        \unexpanded{\f@size}:%
+        \unexpanded\expandafter{\csname\string\color@.\endcsname}%
+      }%
+    \unexpanded{\unless\ifx\xister@tmp\xister@last@font}%
+      \ifxister@debug@
+        \unexpanded
+          {%
+            \typeout
+              {%
+                Cistercian Info: Font changed. Building glyphs for
+                \xister@tmp
+              }%
+          }%
+      \fi
+    \unexpanded
+      {%
+          \let\xister@last@font\xister@tmp
+          \xister@build
+        \fi
+      }%
+  }
+\AtBeginDocument{\xister@ensure@current}
+%    \end{macrocode}
+% \end{macro}
+%
+% \clearpage
+% \PrintIndex
