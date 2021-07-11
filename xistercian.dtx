@@ -224,14 +224,20 @@ and the derived files           xistercian.pdf
 % There are variables stored as macros to be evaluated later, as well as
 % register types for faster access during the glyph drawing.
 %    \begin{macrocode}
-\newcommand*\xister@t{.1ex}
+\newcommand*\xister@th{.1ex}
+\newcommand*\xister@tv{.1ex}
+\newcommand*\xister@tdu{.1ex}
+\newcommand*\xister@tdd{.1ex}
 \newcommand*\xister@x{.4em}
 \newcommand*\xister@y{1.55ex}
 \newcommand*\xister@font{\normalfont}
 \newif\ifxister@debug@
 \newdimen\xister@X
 \newdimen\xister@Y
-\newdimen\xister@T
+\newdimen\xister@Th
+\newdimen\xister@Tv
+\newdimen\xister@Tdu
+\newdimen\xister@Tdd
 \newdimen\xister@TMPA
 \newdimen\xister@TMPB
 %    \end{macrocode}
@@ -258,14 +264,26 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \ekvifdefinedset{xister}
   {\PackageError{xistercian}{keyval conflict detected. Aborting}{}\endinput}{}
-\protected\long\ekvdef{xister}{width}{\edef\xister@x{\unexpanded{#1}}}
-\ekvletkv{xister}{wd}{xister}{width}
-\protected\long\ekvdef{xister}{height}{\edef\xister@y{\unexpanded{#1}}}
-\ekvletkv{xister}{ht}{xister}{height}
-\protected\long\ekvdef{xister}{stroke}{\edef\xister@t{\unexpanded{#1}}}
-\ekvletkv{xister}{s}{xister}{stroke}
+\def\xister@tmp#1#2#3%
+  {%
+    \protected\long\ekvdef{xister}{#1}{#3}%
+    \ekvletkv{xister}{#2}{xister}{#1}%
+  }
+\xister@tmp{wd}{width}{\edef\xister@x{\unexpanded{#1}}}
+\xister@tmp{ht}{height}{\edef\xister@y{\unexpanded{#1}}}
+\xister@tmp{sv}{stroke-v}{\edef\xister@tv{\unexpanded{#1}}}
+\xister@tmp{sh}{stroke-h}{\edef\xister@th{\unexpanded{#1}}}
+\xister@tmp{sdu}{stroke-du}{\edef\xister@tdu{\unexpanded{#1}}}
+\xister@tmp{sdd}{stroke-dd}{\edef\xister@tdd{\unexpanded{#1}}}
+\xister@tmp{s}{strokes}
+  {%
+    \edef\xister@tv{\unexpanded{#1}}%
+    \let\xister@th\xister@tv
+    \let\xister@tdu\xister@tv
+    \let\xister@tdd\xister@tv
+  }
+\xister@tmp{f}{font}{\edef\xister@font{\unexpanded{#1}}}
 \ekvdefNoVal{xister}{debug}{\xister@debug@true}
-\protected\long\ekvdef{xister}{font}{\edef\xister@font{\unexpanded{#1}}}
 %    \end{macrocode}
 % and parse the package options (and since the used names |width|, |height|, and
 % |debug| are quite frequent we don't look at the global options).
@@ -447,8 +465,8 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \newcommand*\xister@clip[1]
   {%
-    \pgfpathrectanglecorners{\pgfpoint{\z@}{#1}}%
-                            {\pgfpoint{\xister@X}{\xister@Y}}%
+    \pgfpathrectanglecorners{\pgfpoint\z@{#1}}%
+                            {\pgfpoint\xister@X\xister@Y}%
     \pgfusepath{clip}%
   }
 %    \end{macrocode}
@@ -464,64 +482,61 @@ and the derived files           xistercian.pdf
   {%
     \xister@drawdigit{1#1}%
       {%
-        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
-        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+        \pgfsetlinewidth{2\xister@Th}%
+        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@Th\relax
+        \pgfpathmoveto{\pgfpoint\z@\xister@TMPA}%
+        \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
       }%
     \xister@drawdigit{2#1}%
       {%
-        \xister@TMPA=\dimexpr\xister@Y/6+#2\xister@T\relax
-        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+        \pgfsetlinewidth{2\xister@Th}%
+        \xister@TMPA=\dimexpr\xister@Y/6+#2\xister@Th\relax
+        \pgfpathmoveto{\pgfpoint\z@\xister@TMPA}%
+        \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
       }%
     \xister@drawdigit{3#1}%
       {%
         \xister@TMPA=\dimexpr\xister@Y/6\relax
         \xister@clip\xister@TMPA
-        \pgfpathmoveto{\pgfpoint{\z@}{\xister@Y}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
+        \pgfsetlinewidth{2\xister@Tdd}%
+        \pgfpathmoveto
+          {\pgfpoint{\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdd}%
+                    \xister@Y}%
+        \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
       }%
     \xister@drawdigit{4#1}%
       {%
         \xister@clip\z@
-        \pgfpathmoveto{\pgfpoint{\z@}{\dimexpr\xister@Y/6\relax}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@Y}}%
+        \pgfsetlinewidth{2\xister@Tdu}%
+        \pgfpathmoveto{\pgfpoint\z@{\dimexpr\xister@Y/6\relax}}%
+        \pgfpathlineto{\pgfpoint\xister@X\xister@Y}%
       }%
-    \xister@drawdigit{5#1}%
+    \xister@superimpose{5#1}%
       {%
-        \xister@clip\z@
-        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
-        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\z@}{\dimexpr\xister@Y/6\relax}}%
+        \rlap{\copy\csname xister@digitbox@1#1\endcsname}%
+        \copy\csname xister@digitbox@4#1\endcsname
       }%
     \xister@drawdigit{6#1}%
       {%
-        \pgfpathmoveto{\pgfpoint{\xister@X}{\xister@Y}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\dimexpr\xister@Y/6\relax}}%
+        \pgfsetlinewidth{2\xister@Tv}%
+        \pgfpathmoveto{\pgfpoint\xister@X\xister@Y}%
+        \pgfpathlineto{\pgfpoint\xister@X{\dimexpr\xister@Y/6\relax}}%
       }%
-    \xister@drawdigit{7#1}%
+    \xister@superimpose{7#1}%
       {%
-        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
-        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\dimexpr\xister@Y/6\relax}}%
+        \rlap{\copy\csname xister@digitbox@1#1\endcsname}%
+        \copy\csname xister@digitbox@6#1\endcsname
       }%
-    \xister@drawdigit{8#1}%
+    \xister@superimpose{8#1}%
       {%
-        \xister@TMPA=\dimexpr\xister@Y/6+#2\xister@T\relax
-        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@Y}}%
+        \rlap{\copy\csname xister@digitbox@2#1\endcsname}%
+        \copy\csname xister@digitbox@6#1\endcsname
       }%
-    \xister@drawdigit{9#1}%
+    \xister@superimpose{9#1}%
       {%
-        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@T\relax
-        \xister@TMPB=\dimexpr\xister@Y/6+#2\xister@T\relax
-        \pgfpathmoveto{\pgfpoint{\z@}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPA}}%
-        \pgfpathlineto{\pgfpoint{\xister@X}{\xister@TMPB}}%
-        \pgfpathlineto{\pgfpoint{\z@}{\xister@TMPB}}%
+        \rlap{\copy\csname xister@digitbox@1#1\endcsname}%
+        \rlap{\copy\csname xister@digitbox@2#1\endcsname}%
+        \copy\csname xister@digitbox@6#1\endcsname
       }%
   }
 %    \end{macrocode}
@@ -538,13 +553,21 @@ and the derived files           xistercian.pdf
             {\pgfpoint{-1.2\xister@X}{-1.2\xister@Y}}%
             {\pgfpoint{1.2\xister@X}{1.2\xister@Y}}%
           \pgfusepath{use as bounding box}%
-          \pgfsetlinewidth{2\xister@T}%
           #2%
           \pgfusepath{stroke}%
           \pgfsetbaseline{\xister@sgn\xister@Y}%
         \end{pgfpicture}%
       }%
   }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@superimpose}
+%   Some digits can be build from a few of the other ones. This is faster than
+%   drawing everything again, and this macro eases the process a bit.
+%    \begin{macrocode}
+\newcommand\xister@superimpose[2]
+  {\expandafter\setbox\csname xister@digitbox@#1\endcsname=\hbox{#2}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -561,11 +584,17 @@ and the derived files           xistercian.pdf
   {%
     \begingroup
       \xister@font
-      \expandafter
-    \endgroup
-    \expandafter\xister@X\the\dimexpr.5\dimexpr\xister@x\relax\expandafter\relax
-    \expandafter\xister@Y\the\dimexpr.5\dimexpr\xister@y\relax\expandafter\relax
-    \expandafter\xister@T\the\dimexpr.5\dimexpr\xister@t\relax\relax
+      \edef\xister@tmp
+        {%
+          \endgroup
+          \xister@X=\the\dimexpr.5\dimexpr\xister@x\relax\relax
+          \xister@Y=\the\dimexpr.5\dimexpr\xister@y\relax\relax
+          \xister@Th=\the\dimexpr.5\dimexpr\xister@th\relax\relax
+          \xister@Tv=\the\dimexpr.5\dimexpr\xister@tv\relax\relax
+          \xister@Tdu=\the\dimexpr.5\dimexpr\xister@tdu\relax\relax
+          \xister@Tdd=\the\dimexpr.5\dimexpr\xister@tdd\relax\relax
+        }
+    \xister@tmp
   }
 %    \end{macrocode}
 % \end{macro}
@@ -582,17 +611,24 @@ and the derived files           xistercian.pdf
     \def\xister@sgn{-}%
     \xister@drawdigit{0}%
       {%
-        \pgfpathmoveto{\pgfpoint{\z@}{-\xister@Y}}%
-        \pgfpathlineto{\pgfpoint{\z@}{\xister@Y}}%
+        \pgfsetlinewidth{2\xister@Tv}%
+        \pgfpathmoveto{\pgfpoint\z@{-\xister@Y}}%
+        \pgfpathlineto{\pgfpoint\z@\xister@Y}%
       }%
     \xister@drawdigits{}{}%
     \xister@X=-\xister@X
-    \xister@drawdigits{0}{}%
-    \def\xister@sgn{+}%
     \xister@Y=-\xister@Y
+    \def\xister@sgn{+}%
     \xister@drawdigits{000}{-}%
+    \xister@TMPA=\xister@Tdd
+    \xister@Tdd=\xister@Tdu
+    \xister@Tdu=\xister@TMPA
     \xister@X=-\xister@X
     \xister@drawdigits{00}{-}%
+    \xister@X=-\xister@X
+    \xister@Y=-\xister@Y
+    \def\xister@sgn{-}%
+    \xister@drawdigits{0}{}%
   }
 %    \end{macrocode}
 % \end{macro}
