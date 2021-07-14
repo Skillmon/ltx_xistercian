@@ -59,6 +59,7 @@ and the derived files           xistercian.pdf
 \PassOptionsToPackage{full}{textcomp}
 \documentclass{l3doc}
 \RequirePackage[fulloldstyle,nott]{kpfonts}
+\RequirePackage{csquotes}
 \RequirePackage{randtext}
 \input{glyphtounicode}
 \pdfgentounicode=1
@@ -73,14 +74,15 @@ and the derived files           xistercian.pdf
     \begingroup
       \color{red!65!black}^^A
       \cisterciansetup{s=.15ex}^^A
-      \printcistercian{#1}^^A
+      \cisterciannum{#1}^^A
     \endgroup
   }
 \newcommand*\mydefault[1]
   {^^A
     \begingroup
       \color{darkgray}^^A
-      \hfill initially:\@
+      \myrestoredefaults
+      \hfill
       \texttt
         {^^A
           \detokenize\expandafter\expandafter\expandafter
@@ -89,7 +91,50 @@ and the derived files           xistercian.pdf
         }^^A
     \endgroup
   }
+\newcommand*\mysdefault[1]
+  {^^A
+    \begingroup
+      \color{darkgray}^^A
+      \myrestoredefaults
+      \hfill
+      \texttt{#1}^^A
+    \endgroup
+  }
 \pagenumbering{cistercian}
+\ExplSyntaxOn
+\makeatletter
+\def\myrestoredefaults#1{\def\unexpanded{#1}{\unexpanded\expandafter{#1}}}
+\edef\myrestoredefaults
+  {
+    \myrestoredefaults\xister@x
+    \myrestoredefaults\xister@y
+    \myrestoredefaults\xister@bx
+    \myrestoredefaults\xister@by
+    \myrestoredefaults\xister@tv
+    \myrestoredefaults\xister@th
+    \myrestoredefaults\xister@tdu
+    \myrestoredefaults\xister@tdd
+    \myrestoredefaults\xister@font
+  }
+\makeatother
+\newcommand\examplerow[1]
+  {
+    \cisterciannum{1#1}&\cisterciannum{2#1}&\cisterciannum{3#1}&
+    \cisterciannum{4#1}&\cisterciannum{5#1}&\cisterciannum{6#1}&
+    \cisterciannum{7#1}&\cisterciannum{8#1}&\cisterciannum{9#1}\\
+    \noalign{\vskip-.5ex}
+    $1#1$&$2#1$&$3#1$&
+    $4#1$&$5#1$&$6#1$&
+    $7#1$&$8#1$&$9#1$\\
+    \noalign{\vskip1ex}
+  }
+\AddToHook{bfseries}
+  {
+    \cisterciansetup{sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.5em}
+    \cistercianredrawlazy
+  }
+\AddToHook{mdseries}{\myrestoredefaults\cistercianredrawlazy}
+\ExplSyntaxOff
 \begin{document}
   \title{The \pkg{xistercian} package}
   \author{Jonathan P. Spratte\thanks{\protect\randomize{jspratte@yahoo.de}}}
@@ -105,29 +150,91 @@ and the derived files           xistercian.pdf
 %
 % The \pkg{xistercian} package provides Cistercian numerals for use in \LaTeX.
 % The name is chosen to be \pkg{xistercian} instead of \pkg{cistercian} because
-% as of writing this an unpublished package by that name already exists.
+% I've learned that a (currently) unpublished package by that name already
+% exists and I don't want to be an evil name-stealer.
+%
+%
+% \subsection{Introduction}
 %
 % Cistercian numerals are a system to denote the numbers from $1$ to $9999$ with
-% a single glyph. They use a stem denoting zero (\cistexnum{0}) and add the
-% digits to that using small tick marks, the place denoting the digits value. On
-% the upper right means units (\cistexnum{1}), upper left tens (\cistexnum{10}),
-% lower right hundreds (\cistexnum{100}), and lower left thousands
-% (\cistexnum{1000}).
+% a single glyph. They use a stem (\cistexnum{0}) that is used as zero by this
+% package, and add the digits to that using small tick marks, the place denoting
+% the digits value. On the upper right means units (\cistexnum{1}), upper left
+% tens (\cistexnum{10}), lower right hundreds (\cistexnum{100}), and lower left
+% thousands (\cistexnum{1000}).
 %
-% The glyphs created by this package all have the same bounding box 
-% 
+% Figure~\ref{fig:glyphs} gives an overview over the base glyphs. In the
+% medieval times it was quite common (according to Wikipedia more common than
+% the vertical style) to use the Cistercian numerals horizontally instead.
+% This package also supports that, in which case the numerals are rotated by
+% $90$ degrees counter-clockwise, see figure~\ref{fig:glyphs:h}.
+%
+% All glyphs have the same bounding box, are drawn using the \pkg{pgf}
+% package, and cached inside \TeX\ box registers. Therefore the performance is
+% quite well, at least well enough to actually consider using these numerals
+% without a major performance hit. But it still slows down the compilation,
+% especially if the glyphs have to be redrawn often. They have to be redrawn if
+% the font size or text colour have changed since the last usage inside the
+% current group scope.
+%
+% \begin{figure}
+%   \centering
+%   \small
+%   \cistercianredraw
+%   \begin{tabular}{*9c}
+%     \examplerow{}
+%     \examplerow{0}
+%     \examplerow{00}
+%     \examplerow{000}
+%   \end{tabular}
+%   \caption{The different base glyphs in vertical mode\label{fig:glyphs}}
+% \end{figure}
+%
+% \begin{figure}
+%   \centering
+%   \small
+%   \cisterciansetup{o=h,ht=1ex,wd=.7em}\cistercianredraw
+%   \begin{tabular}{*9c}
+%     \examplerow{}
+%     \examplerow{0}
+%     \examplerow{00}
+%     \examplerow{000}
+%   \end{tabular}
+%   \caption{The different base glyphs in horizontal mode\label{fig:glyphs:h}}
+% \end{figure}
+%
+% Since Cistercian numerals quite compactly cover a big range of natural numbers
+% they might be used to compactly keep track of running numbers. For instance,
+% to use Cistercian numerals as page numbers you can use:
+% \begin{verbatim}
+% \pagenumbering{cistercian}
+% \end{verbatim}
+%
+% The package tries to play nice on \pkg{hyperref} if it is loaded, but
+% bookmarks containing material that should've been a Cistercian numeral will
+% have a leading |CISTER| in front of the numeric value to give unique
+% strings compared to |\arabic|.
+%
+% Negative numbers just keep a leading~|-|, and numbers with an absolute number
+% greater than $9999$ are displayed with multiple Cistercian digits. For
+% instance $-12345678$ is displayed as \cistexnum{-12345678}.
+%
 %
 % \subsection{Options}
 %
-% The options described here are all usable as package options. \pkg{xistercian}
-% doesn't parse the global options provided to the document class. Additionally
-% you can change the options (except for |debug|) using |\cisterciansetup|.
+% The options described here are all usable as package options (except when
+% explicitly stated otherwise). \pkg{xistercian} doesn't parse the global
+% options provided to the document class. Additionally you can change the
+% options (except for the |debug| option) using |\cisterciansetup|.
 %
 % For the options |width| and |height|, and probably also the strokes, you
 % should use dimensions using |ex| or |em| to get sizes depending on the current
 % font size. For all three of those options the \meta{dimension expression} is
 % evaluated (using the setup specified in |font|) every time the font size
-% changed since the last time a Cistercian numeral should've been printed.
+% changed (or the colour) since the last time a Cistercian numeral should've
+% been printed.
+%
+% Initial values if present are printed on the right.
 %
 % \begin{function}{width,wd}
 %   \begin{syntax}
@@ -143,35 +250,90 @@ and the derived files           xistercian.pdf
 %   Set the height of the Cistercian numeral digits.
 % \end{function}
 %
+% \begin{function}{bound-x,bx}
+%   \begin{syntax}
+%     bound-x = \marg{factor} \mydefault{bx}
+%   \end{syntax}
+%   Specifies the factor of the bounding box relative to the |width| in
+%   $x$-direction.
+% \end{function}
+%
+% \begin{function}{bound-y,by}
+%   \begin{syntax}
+%     bound-y = \marg{factor} \mydefault{by}
+%   \end{syntax}
+%   Specifies the factor of the bounding box relative to the |height| in
+%   $y$-direction.
+% \end{function}
+%
+% \begin{function}{baseline,bs}
+%   \begin{syntax}
+%     baseline = \marg{factor} \mysdefault{\normalfont\emph{empty}}
+%   \end{syntax}
+%   Sets the baseline of the symbols in multiples of the negative height. $1$
+%   (or empty) results in the symbol starting on the surrounding baseline,
+%   bigger values shift it downwards, smaller values upwards.
+% \end{function}
+%
 % \begin{function}{stroke-v,sv}
 %   \begin{syntax}
 %     stroke-v = \marg{dimension expression} \mydefault{tv}
 %   \end{syntax}
+%   Sets the stroke thickness of vertical strokes.
 % \end{function}
 %
 % \begin{function}{stroke-h,sh}
 %   \begin{syntax}
 %     stroke-h = \marg{dimension expression} \mydefault{th}
 %   \end{syntax}
+%   Sets the stroke thickness of horizontal strokes.
 % \end{function}
 %
 % \begin{function}{stroke-du,sdu}
 %   \begin{syntax}
 %     stroke-du = \marg{dimension expression} \mydefault{tdu}
 %   \end{syntax}
+%   Sets the stroke thickness of diagonal strokes going from lower left to upper
+%   right.
 % \end{function}
 %
 % \begin{function}{stroke-dd,sdd}
 %   \begin{syntax}
 %     stroke-dd = \marg{dimension expression} \mydefault{tdd}
 %   \end{syntax}
+%   Sets the stroke thickness of diagonal strokes going from upper left to lower
+%   right.
 % \end{function}
 %
 % \begin{function}{strokes,s}
 %   \begin{syntax}
-%     stroke = \marg{dimension expression} \mydefault{t}
+%     stroke = \marg{dimension expression}
 %   \end{syntax}
-%   Set the stroke width of the Cistercian numeral digits.
+%   Sets all stroke thicknesses at once.
+% \end{function}
+%
+% \begin{function}{orientation,o}
+%   \begin{syntax}
+%     orientation = \marg{choice} \mysdefault{vertical}
+%   \end{syntax}
+%   Sets the orientation of the Cistercian numerals. Choices are |horizontal|
+%   (or |h| for short) or |vertical| (or |v| for short). You'll most likely want
+%   to change the |width| and |height| of the symbols if you decide to change
+%   this.
+% \end{function}
+%
+% \begin{function}{horizontal}
+%   \begin{syntax}
+%     horizontal
+%   \end{syntax}
+%   Same as setting |orientation = horizontal|.
+% \end{function}
+%
+% \begin{function}{vertical}
+%   \begin{syntax}
+%     vertical
+%   \end{syntax}
+%   Same as setting |orientation = vertical|.
 % \end{function}
 %
 % \begin{function}{font}
@@ -197,20 +359,26 @@ and the derived files           xistercian.pdf
 %   \begin{syntax}
 %     \cs{cistercian}\marg{counter}
 %   \end{syntax}
-%   Prints the value of the \LaTeXe\ \meta{counter} as a Cistercian numeral.
+%   Prints the value of the \LaTeXe\ \meta{counter} as a Cistercian numeral
+%   (similar to how |\roman| prints a \meta{counter} as a Roman numeral). It can
+%   also be used as |\pagenumbering{cistercian}| to change the page numbering,
+%   \emph{etc}.
 % \end{function}
 %
-% \begin{function}{\printcistercian}
+% \begin{function}{\cisterciannum}
 %   \begin{syntax}
-%     \cs{printcistercian}\marg{integer}
+%     \cs{cisterciannum}\marg{integer}
 %   \end{syntax}
 %   Prints the \meta{integer} as a Cistercian numeral. The \meta{integer} has to
-%   be provided as a string containing only digits and an optional leading~|-|.
+%   be provided as a string containing only digits and optionally a single
+%   leading~|-| (spaces are ignored). This can handle integers of almost
+%   arbitrary size (well, an integer with more than $2147483647$ places will be
+%   an issue).
 % \end{function}
 %
-% \begin{function}{\Printcistercian}
+% \begin{function}{\cisterciannumE}
 %   \begin{syntax}
-%     \cs{printcistercian}\marg{integer expression}
+%     \cs{cisterciannum}\marg{integer expression}
 %   \end{syntax}
 %   Evaluates the \meta{integer expression} and prints the result as a
 %   Cistercian numeral.
@@ -221,18 +389,54 @@ and the derived files           xistercian.pdf
 %     \cs{cisterciansetup}\marg{key=value,\ldots}
 %   \end{syntax}
 %   Can be used to locally change the options after the package was loaded. The
-%   glyphs of the Cistercian numerals aren't updated just when you change the
-%   setup.
+%   glyphs of the Cistercian numerals aren't automatically updated when you
+%   change the setup.
 % \end{function}
 %
-% \begin{function}{\cistercianredraw}
+% \begin{function}{\cistercianredraw,\cistercianredrawlazy}
 %   \begin{syntax}
 %     \cs{cistercianredraw}
 %   \end{syntax}
-%   When this is used the glyphs 
+%   When this is used the glyphs will be redrawn for the current group. The
+%   |lazy| variant will not immediately redraw the glyphs, but instead ensure
+%   that the next usage of a Cistercian numeral in the current scope will redraw
+%   the glyphs. The |lazy| variant could result in the glyphs being redrawn
+%   multiple times (if Cistercian numerals are used in different nested groups),
+%   while the normal variant might result in the glyphs being redrawn too
+%   eagerly.
 % \end{function}
 %
 %
+% \subsection{Bold Cistercian Numerals}
+%
+% While the package doesn't directly support bold glyphs, it is possible to
+% utilize the hooks provided by the NFSS to pick different stroke widths
+% whenever the font is changed to the |bfseries| and pack to |mdseries|:
+%
+% \begin{verbatim}
+% \AddToHook{bfseries}
+%   {%
+%     \cisterciansetup{sv=.27ex,sdd=.27ex,sh=.15ex,sdu=.15ex,wd=.5em}%
+%     \cistercianredrawlazy
+%   }
+% \AddToHook{mdseries}
+%   {%
+%     \cisterciansetup{sv=.18ex,sdd=.18ex,sh=.1ex,sdu=.1ex,wd=.4em}%
+%     \cistercianredrawlazy
+%   }
+% This results in \cisterciannum{2} different \enquote{series}.\par
+% \bfseries
+% This results in \cisterciannum{2} different \enquote{series}.
+% \end{verbatim}
+%
+% \begingroup
+% This results in \cisterciannum{2} different \enquote{series}.\par
+% \bfseries
+% This results in \cisterciannum{2} different \enquote{series}.
+% \endgroup
+%
+%
+% \clearpage
 % \section{Implementation}
 %
 % First we load the required packages
@@ -248,12 +452,15 @@ and the derived files           xistercian.pdf
 % There are variables stored as macros to be evaluated later, as well as
 % register types for faster access during the glyph drawing.
 %    \begin{macrocode}
-\newcommand*\xister@th{.08ex}
+\newcommand*\xister@th{.1ex}
 \newcommand*\xister@tv{.18ex}
-\newcommand*\xister@tdu{.08ex}
+\newcommand*\xister@tdu{.1ex}
 \newcommand*\xister@tdd{.18ex}
 \newcommand*\xister@x{.4em}
 \newcommand*\xister@y{1.55ex}
+\newcommand*\xister@bx{1.2}
+\newcommand*\xister@by{1.2}
+\newcommand*\xister@bs{}
 \newcommand*\xister@font{\normalfont}
 \newif\ifxister@debug@
 \newdimen\xister@X
@@ -299,6 +506,9 @@ and the derived files           xistercian.pdf
 \xister@tmp{sh}{stroke-h}{\edef\xister@th{\unexpanded{#1}}}
 \xister@tmp{sdu}{stroke-du}{\edef\xister@tdu{\unexpanded{#1}}}
 \xister@tmp{sdd}{stroke-dd}{\edef\xister@tdd{\unexpanded{#1}}}
+\xister@tmp{bx}{bound-x}{\edef\xister@bx{\unexpanded{#1}}}
+\xister@tmp{by}{bound-y}{\edef\xister@by{\unexpanded{#1}}}
+\xister@tmp{bs}{baseline}{\edef\xister@bs{\unexpanded{#1}}}
 \xister@tmp{s}{strokes}
   {%
     \edef\xister@tv{\unexpanded{#1}}%
@@ -307,7 +517,32 @@ and the derived files           xistercian.pdf
     \let\xister@tdd\xister@tv
   }
 \xister@tmp{f}{font}{\edef\xister@font{\unexpanded{#1}}}
-\ekvdefNoVal{xister}{debug}{\xister@debug@true}
+\xister@tmp{o}{orientation}
+  {%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx\csname xister@drawdigits@#1\endcsname\relax
+      \PackageError{xister}%
+        {Unaccepted orientation. Choices are horizontal/h or vertical/v}{}%
+    \else
+      \expandafter\let\expandafter
+        \xister@drawdigits
+        \csname xister@drawdigits@#1\endcsname
+      \expandafter\let\expandafter
+        \xister@drawzero
+        \csname xister@drawzero@#1\endcsname
+    \fi
+  }
+\protected\ekvdefNoVal{xister}{debug}{\xister@debug@true}
+\protected\ekvdefNoVal{xister}{horizontal}
+  {%
+    \let\xister@drawdigits\xister@drawdigits@horizontal
+    \let\xister@drawzero\xister@drawzero@horizontal
+  }
+\protected\ekvdefNoVal{xister}{vertical}
+  {%
+    \let\xister@drawdigits\xister@drawdigits@vertical
+    \let\xister@drawzero\xister@drawzero@vertical
+  }
 %    \end{macrocode}
 % and parse the package options (and since the used names |width|, |height|, and
 % |debug| are quite frequent we don't look at the global options).
@@ -322,6 +557,9 @@ and the derived files           xistercian.pdf
   {\PackageError{xister}{`debug' is only available as a load time option}{}}
 %    \end{macrocode}
 %
+%
+% \subsection{User macros}
+%
 % \begin{macro}{\cisterciansetup}
 %   Just as a simple way to pick options later on.
 %    \begin{macrocode}
@@ -329,44 +567,45 @@ and the derived files           xistercian.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-%
-% \subsection{User macros}
-%
 % \begin{macro}{\cistercian}
 %   The macro is equivalent to other \LaTeX\ counter formatting macros, so we
 %   let it build the counter name and forward that to the canonically named
 %   auxiliary macro |\@cistercian|.
 %    \begin{macrocode}
-\newcommand\cistercian[1]
+\newcommand\cistercian[1]{\expandafter\@cistercian\csname c@#1\endcsname}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\cisterciannum}
+% \begin{macro}[internal]{\cisterciannum@tex,\cisterciannum }
+%    \begin{macrocode}
+\edef\cisterciannum
   {%
-    \xister@texorpdf
-      {\expandafter\@cistercian}%
-      {C\expandafter\@arabic}%
-      \csname c@#1\endcsname
+    \unexpanded{\xister@texorpdf}%
+    \unexpanded\expandafter
+      {\csname cisterciannum \endcsname\cisterciannum@pdf}%
   }
+\protected\expandafter\def\csname cisterciannum \endcsname#1{\xister@a#1@}
+\def\cisterciannum@pdf#1{CISTER#1}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
-% \begin{macro}{\printcistercian}
+% \begin{macro}{\cisterciannumE}
 %    \begin{macrocode}
-\protected\def\printcistercian#1{\xister@a#1@}
+\newcommand\cisterciannumE[1]
+  {\expandafter\cisterciannum\expandafter{\the\numexpr#1\relax}}
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\Printcistercian}
-%    \begin{macrocode}
-\newcommand\Printcistercian[1]
-  {\expandafter\printcistercian\expandafter{\the\numexpr#1\relax}}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\cistercianredraw}
+% \begin{macro}{\cistercianredraw,\cistercianredrawlazy}
 %    \begin{macrocode}
 \protected\def\cistercianredraw
   {%
     \let\xister@last@font\@empty
     \xister@ensure@current
   }
+\protected\def\cistercianredrawlazy{\let\xister@last@font\@empty}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -398,13 +637,19 @@ and the derived files           xistercian.pdf
 % \begin{macro}[internal]{\@cistercian}
 %   Just get the current value of a counter and forward it.
 %    \begin{macrocode}
-\newcommand\@cistercian[1]{\expandafter\printcistercian\expandafter{\the#1}}
+\newcommand\@cistercian[1]{\expandafter\cisterciannum\expandafter{\the#1}}
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}[internal]{\xister@texorpdf}
 %    \begin{macrocode}
 \let\xister@texorpdf\@firstoftwo
+\AddToHook{package/after/hyperref}
+  {%
+    \ifdefined\texorpdfstring
+      \let\xister@texorpdf\texorpdfstring
+    \fi
+  }
 \AddToHook{begindocument/before}
   {%
     \ifdefined\texorpdfstring
@@ -483,27 +728,40 @@ and the derived files           xistercian.pdf
 %
 % \subsection{Drawing the Digits}
 %
-% \begin{macro}[internal]{\xister@clip}
+% \begin{macro}[internal]{\xister@clip@v,\xister@clip@h}
 %   Some of the digit glyphs need a bit of clipping to look nice. Let's define a
 %   small auxiliary to select a clipping region.
 %    \begin{macrocode}
-\newcommand*\xister@clip[1]
+\newcommand*\xister@clip@v[1]
   {%
     \pgfpathrectanglecorners
       {\pgfpoint{\dimexpr\ifdim\xister@X<\z@-\fi\xister@Tv\relax}{#1}}%
       {\pgfpoint\xister@X\xister@Y}%
     \pgfusepath{clip}%
   }
+\newcommand*\xister@clip@h[1]
+  {%
+    \pgfpathrectanglecorners
+      {\pgfpoint{#1}{-\dimexpr\ifdim\xister@Y<\z@-\fi\xister@Th\relax}}%
+      {\pgfpoint{-\xister@X}\xister@Y}%
+    \pgfusepath{clip}%
+  }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\xister@drawdigits,\xister@drawdigit}
+% \begin{macro}[internal]
+%   {
+%     \xister@drawdigits,
+%     \xister@drawdigits@v,\xister@drawdigits@vertical
+%     \xister@drawdigits@h,\xister@drawdigits@horizontal
+%     \xister@drawdigit
+%   }
 %   The digit glyphs. Since each numeral is build from the zero stem and some
 %   appendix to it this only specifies the form of the appendices. The zero stem
 %   is defined a bit down the road. |#1| will determine the decade, and |#2|
 %   will be either~|-| or empty.
 %    \begin{macrocode}
-\newcommand\xister@drawdigits[2]
+\newcommand\xister@drawdigits@vertical[3]
   {%
     \xister@drawdigit{1#1}%
       {%
@@ -523,15 +781,15 @@ and the derived files           xistercian.pdf
       {%
         \xister@TMPA=\dimexpr\xister@Y/6\relax
         \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdd\relax
-        \xister@clip\xister@TMPA
+        \xister@clip@v\xister@TMPA
         \pgfsetlinewidth{2\xister@Tdd}%
-        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@TMPA}
-        \pgfpathlineto{\pgfpoint\xister@TMPB\xister@Y}
+        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@TMPA}%
+        \pgfpathlineto{\pgfpoint\xister@TMPB\xister@Y}%
         \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
       }%
     \xister@drawdigit{4#1}%
       {%
-        \xister@clip\z@
+        \xister@clip@v\z@
         \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdu\relax
         \pgfsetlinewidth{2\xister@Tdu}%
         \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
@@ -540,7 +798,7 @@ and the derived files           xistercian.pdf
       }%
     \xister@drawdigit{5#1}%
       {%
-        \xister@clip\z@
+        \xister@clip@v\z@
         \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdu\relax
         \pgfsetlinewidth{2\xister@Tdu}%
         \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
@@ -575,6 +833,81 @@ and the derived files           xistercian.pdf
         \copy\csname xister@digitbox@6#1\endcsname
       }%
   }
+\newcommand\xister@drawdigits@horizontal[3]
+  {%
+    \xister@drawdigit{1#1}%
+      {%
+        \pgfsetlinewidth{2\xister@Tv}%
+        \xister@TMPA=-\dimexpr\xister@X-#3\xister@Tv\relax
+        \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
+        \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
+      }%
+    \xister@drawdigit{2#1}%
+      {%
+        \pgfsetlinewidth{2\xister@Tv}%
+        \xister@TMPA=-\dimexpr\xister@X/6+#3\xister@Th\relax
+        \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
+        \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
+      }%
+    \xister@drawdigit{3#1}%
+      {%
+        \xister@TMPA=-\dimexpr\xister@X/6\relax
+        \xister@TMPB=\ifdim\xister@Y<\z@-\fi\dimexpr\xister@Th-\xister@Tdu\relax
+        \xister@clip@h\xister@TMPA
+        \pgfsetlinewidth{2\xister@Tdu}%
+        \pgfpathmoveto{\pgfpoint\xister@TMPA\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint{-\xister@X}\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
+      }%
+    \xister@drawdigit{4#1}%
+      {%
+        \xister@clip@h\z@
+        \xister@TMPB=\ifdim\xister@Y<\z@-\fi\dimexpr\xister@Th-\xister@Tdd\relax
+        \pgfsetlinewidth{2\xister@Tdd}%
+        \pgfpathmoveto{\pgfpoint\xister@X\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint{-\dimexpr\xister@X/6\relax}\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint{-\xister@X}\xister@Y}%
+      }%
+    \xister@drawdigit{5#1}%
+      {%
+        \xister@clip@h\z@
+        \xister@TMPB=\ifdim\xister@Y<\z@-\fi\dimexpr\xister@Th-\xister@Tdd\relax
+        \pgfsetlinewidth{2\xister@Tdd}%
+        \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint{-\dimexpr\xister@X/6\relax}\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint{-\xister@X}\xister@Y}%
+        \pgfusepath{stroke,clip}%
+        \pgfsetlinewidth{2\xister@Tv}%
+        \xister@TMPA=-\dimexpr\xister@X-#3\xister@Tv\relax
+        \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
+        \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
+      }%
+    \xister@drawdigit{6#1}%
+      {%
+        \pgfsetlinewidth{2\xister@Th}%
+        \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@Y}%
+        \pgfpathlineto{\pgfpoint{-\dimexpr\xister@X/6\relax}\xister@Y}%
+      }%
+    \xister@superimpose{7#1}%
+      {%
+        \rlap{\copy\csname xister@digitbox@1#1\endcsname}%
+        \copy\csname xister@digitbox@6#1\endcsname
+      }%
+    \xister@superimpose{8#1}%
+      {%
+        \rlap{\copy\csname xister@digitbox@2#1\endcsname}%
+        \copy\csname xister@digitbox@6#1\endcsname
+      }%
+    \xister@superimpose{9#1}%
+      {%
+        \rlap{\copy\csname xister@digitbox@1#1\endcsname}%
+        \rlap{\copy\csname xister@digitbox@2#1\endcsname}%
+        \copy\csname xister@digitbox@6#1\endcsname
+      }%
+  }
+\let\xister@drawdigits@v\xister@drawdigits@vertical
+\let\xister@drawdigits@h\xister@drawdigits@horizontal
+\let\xister@drawdigits\xister@drawdigits@v
 %    \end{macrocode}
 %   Each digit has the same bounding box and baseline which is specified here.
 %   Also, the stroke width is set equal for each of the digits. |#1| will be the
@@ -586,15 +919,47 @@ and the derived files           xistercian.pdf
       {%
         \begin{pgfpicture}%
           \pgfpathrectanglecorners
-            {\pgfpoint{-1.2\xister@X}{-1.2\xister@Y}}%
-            {\pgfpoint{1.2\xister@X}{1.2\xister@Y}}%
+            {\pgfpoint{-\xister@bx\xister@X}{-\xister@by\xister@Y}}%
+            {\pgfpoint{\xister@bx\xister@X}{\xister@by\xister@Y}}%
           \pgfusepath{use as bounding box}%
           #2%
           \pgfusepath{stroke}%
-          \pgfsetbaseline{\xister@sgn\xister@Y}%
+          \pgfsetbaseline{\xister@sgn\xister@bs\xister@Y}%
         \end{pgfpicture}%
       }%
   }
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}[internal]
+%   {
+%     \xister@drawzero,
+%     \xister@drawzero@h,\xister@drawzero@horizontal,
+%     \xister@drawzero@v,\xister@drawzero@vertical,
+%   }
+%    \begin{macrocode}
+\newcommand*\xister@drawzero@vertical
+  {%
+    \xister@drawdigit{0}%
+      {%
+        \pgfsetlinewidth{2\xister@Tv}%
+        \pgfpathmoveto{\pgfpoint\z@{-\xister@Y}}%
+        \pgfpathlineto{\pgfpoint\z@\xister@Y}%
+      }%
+  }
+\newcommand*\xister@drawzero@horizontal
+  {%
+    \xister@drawdigit{0}%
+      {%
+        \pgfsetlinewidth{2\xister@Th}%
+        \pgfpathmoveto{\pgfpoint{-\xister@X}\z@}%
+        \pgfpathlineto{\pgfpoint\xister@X\z@}%
+      }%
+  }
+\let\xister@drawzero@v\xister@drawzero@vertical
+\let\xister@drawzero@h\xister@drawzero@horizontal
+\let\xister@drawzero\xister@drawzero@v
 %    \end{macrocode}
 % \end{macro}
 %
@@ -629,7 +994,7 @@ and the derived files           xistercian.pdf
           \xister@Tv=\the\dimexpr.5\dimexpr\xister@tv\relax\relax
           \xister@Tdu=\the\dimexpr.5\dimexpr\xister@tdu\relax\relax
           \xister@Tdd=\the\dimexpr.5\dimexpr\xister@tdd\relax\relax
-        }
+        }%
     \xister@tmp
   }
 %    \end{macrocode}
@@ -645,26 +1010,21 @@ and the derived files           xistercian.pdf
   {%
     \xister@setlengths
     \def\xister@sgn{-}%
-    \xister@drawdigit{0}%
-      {%
-        \pgfsetlinewidth{2\xister@Tv}%
-        \pgfpathmoveto{\pgfpoint\z@{-\xister@Y}}%
-        \pgfpathlineto{\pgfpoint\z@\xister@Y}%
-      }%
-    \xister@drawdigits{}{}%
+    \xister@drawzero
+    \xister@drawdigits{}{}{}%
     \xister@X=-\xister@X
     \xister@Y=-\xister@Y
     \def\xister@sgn{+}%
-    \xister@drawdigits{000}{-}%
+    \xister@drawdigits{000}{-}{-}%
     \xister@TMPA=\xister@Tdd
     \xister@Tdd=\xister@Tdu
     \xister@Tdu=\xister@TMPA
     \xister@X=-\xister@X
-    \xister@drawdigits{00}{-}%
+    \xister@drawdigits{00}{-}{}%
     \xister@X=-\xister@X
     \xister@Y=-\xister@Y
     \def\xister@sgn{-}%
-    \xister@drawdigits{0}{}%
+    \xister@drawdigits{0}{}{-}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -693,8 +1053,8 @@ and the derived files           xistercian.pdf
           {%
             \typeout
               {%
-                Cistercian Info: Font changed. Building glyphs for
-                \xister@tmp
+                Package xistercian Info: Font changed. Building glyphs for
+                \xister@tmp.
               }%
           }%
       \fi
