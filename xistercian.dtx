@@ -54,7 +54,7 @@ and the derived files           xistercian.pdf
   \expandafter\endgroup
 \fi
 %
-\IfFileExists{xistercian.sty}{\RequirePackage{xistercian}}{}
+\IfFileExists{xistercian.sty}{\RequirePackage[debug]{xistercian}}{}
 \ProvidesFile{xistercian.dtx}[2021-07-10 v1.0.0 Cistercian numerals in LaTeX]
 \PassOptionsToPackage{full}{textcomp}
 \documentclass{l3doc}
@@ -129,11 +129,9 @@ and the derived files           xistercian.pdf
     \noalign{\vskip1ex}
   }
 \AddToHook{bfseries}
-  {
-    \cisterciansetup{sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.5em}
-    \cistercianredrawlazy
-  }
-\AddToHook{mdseries}{\myrestoredefaults\cistercianredrawlazy}
+  {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.5em}}
+\AddToHook{mdseries}{\myrestoredefaults}
+\cisterciansetup{redraw+=series}
 \ExplSyntaxOff
 \begin{document}
   \title{The \pkg{xistercian} package}
@@ -161,11 +159,11 @@ and the derived files           xistercian.pdf
 % package, and add the digits to that using small tick marks, the place denoting
 % the digits value. On the upper right means units (\cistexnum{1}), upper left
 % tens (\cistexnum{10}), lower right hundreds (\cistexnum{100}), and lower left
-% thousands (\cistexnum{1000}).
+% thousands (\cistexnum{1000}). Figure~\ref{fig:glyphs} gives an overview over
+% the base glyphs.
 %
-% Figure~\ref{fig:glyphs} gives an overview over the base glyphs. In the
-% medieval times it was quite common (according to Wikipedia more common than
-% the vertical style) to use the Cistercian numerals horizontally instead.
+% In the medieval times it was quite common (according to Wikipedia more common
+% than the vertical style) to use the Cistercian numerals horizontally instead.
 % This package also supports that, in which case the numerals are rotated by
 % $90$ degrees counter-clockwise, see figure~\ref{fig:glyphs:h}.
 %
@@ -173,9 +171,9 @@ and the derived files           xistercian.pdf
 % package, and cached inside \TeX\ box registers. Therefore the performance is
 % quite well, at least well enough to actually consider using these numerals
 % without a major performance hit. But it still slows down the compilation,
-% especially if the glyphs have to be redrawn often. They have to be redrawn if
-% the font size or text colour have changed since the last usage inside the
-% current group scope.
+% especially if the glyphs have to be redrawn often. By default they will be
+% redrawn if the font size changed since the last usage inside the current group
+% scope, but you can specify which font feature changes should cause a redraw.
 %
 % \begin{figure}
 %   \centering
@@ -217,22 +215,24 @@ and the derived files           xistercian.pdf
 %
 % Negative numbers just keep a leading~|-|, and numbers with an absolute number
 % greater than $9999$ are displayed with multiple Cistercian digits. For
-% instance $-12345678$ is displayed as \cistexnum{-12345678}.
+% instance $-12345678$ is displayed as \cistexnum{-12345678}. And in the seldom
+% case that four consecutive digits are zeros they get displayed as that:
+% \cistexnum{10000} is $10000$.
 %
 %
 % \subsection{Options}
 %
 % The options described here are all usable as package options (except when
 % explicitly stated otherwise). \pkg{xistercian} doesn't parse the global
-% options provided to the document class. Additionally you can change the
+% options provided to the documentclass. Additionally you can change the
 % options (except for the |debug| option) using |\cisterciansetup|.
 %
 % For the options |width| and |height|, and probably also the strokes, you
 % should use dimensions using |ex| or |em| to get sizes depending on the current
 % font size. For all three of those options the \meta{dimension expression} is
-% evaluated (using the setup specified in |font|) every time the font size
-% changed (or the colour) since the last time a Cistercian numeral should've
-% been printed.
+% evaluated (using the setup specified in |font|) every time the font changed
+% according to the |redraw| option's feature list (by default only when the size
+% changed) since the last time a they were drawn.
 %
 % Initial values if present are printed on the right.
 %
@@ -336,12 +336,33 @@ and the derived files           xistercian.pdf
 %   Same as setting |orientation = vertical|.
 % \end{function}
 %
-% \begin{function}{font}
+% \begin{function}{font,f}
 %   \begin{syntax}
 %     font = \marg{font setup} \mydefault{font}
 %   \end{syntax}
 %   Set the font which \pkg{xistercian} uses locally to evaluate the dimensions
 %   given to |width|, |height|, and |stroke|.
+% \end{function}
+%
+% \begin{function}{redraw,r}
+%   \begin{syntax}
+%     redraw = \marg{feature-list} \mysdefault{size}
+%     redraw += \marg{feature-list}
+%   \end{syntax}
+%   Selects which font features to consider when deciding to redraw the glyphs.
+%   If one of the features have changed (or the features to consider) the glyphs
+%   will be redrawn. This is especially handy if you change the |font| used
+%   while evaluating the given dimensions. The available features in the comma
+%   separated \meta{feature-list} are |encoding|, |family|, |series|, |shape|,
+%   |size|, and |color|.
+%
+%   If you see that a Cistercian numeral doesn't have the correct colour of the
+%   surrounding text you need to add |color| to the font features
+%   (\pkg{xistercian} uses some hack to get the boxed glyphs to respect the
+%   surrounding colour, but that hack might fail in certain circumstances).
+%
+%   If you use the |+|~variant of this option the \meta{feature-list} is added
+%   to the existing features, else they overwrite any existing configuration.
 % \end{function}
 %
 % \begin{function}{debug}
@@ -361,8 +382,8 @@ and the derived files           xistercian.pdf
 %   \end{syntax}
 %   Prints the value of the \LaTeXe\ \meta{counter} as a Cistercian numeral
 %   (similar to how |\roman| prints a \meta{counter} as a Roman numeral). It can
-%   also be used as |\pagenumbering{cistercian}| to change the page numbering,
-%   \emph{etc}.
+%   also be used as |\pagenumbering|\hskip0pt |{cistercian}| to change the page
+%   numbering, \emph{etc}.
 % \end{function}
 %
 % \begin{function}{\cisterciannum}
@@ -411,7 +432,7 @@ and the derived files           xistercian.pdf
 %
 % While the package doesn't directly support bold glyphs, it is possible to
 % utilize the hooks provided by the NFSS to pick different stroke widths
-% whenever the font is changed to the |bfseries| and pack to |mdseries|:
+% whenever the font is changed to |bfseries| and back to |mdseries|:
 %
 % \begin{verbatim}
 % \AddToHook{bfseries}
@@ -434,6 +455,17 @@ and the derived files           xistercian.pdf
 % \bfseries
 % This results in \cisterciannum{2} different \enquote{series}.
 % \endgroup
+%
+% Of course, instead of doing |\cistercianredrawlazy| in the above code, we
+% could as well do the following equivalent thing and let \pkg{xistercian}
+% determine when to redraw:
+% \begin{verbatim}
+% \AddToHook{bfseries}
+%   {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.15ex,sdu=.15ex,wd=.5em}}
+% \AddToHook{mdseries}
+%   {\cisterciansetup{sv=.18ex,sdd=.18ex,sh=.1ex,sdu=.1ex,wd=.4em}}
+% \cisterciansetup{redraw+=series}
+% \end{verbatim}
 %
 %
 % \clearpage
@@ -532,6 +564,11 @@ and the derived files           xistercian.pdf
         \csname xister@drawzero@#1\endcsname
     \fi
   }
+\xister@tmp{r}{redraw}
+  {\let\xister@fontfeatures\@empty\ekvcsvloop\xister@add@fontfeature{#1}}
+\xister@tmp{r+}{redraw+}{\ekvcsvloop\xister@add@fontfeature{#1}}
+\ekvletkv{xister}{r +}{xister}{r+}
+\ekvletkv{xister}{redraw +}{xister}{redraw+}
 \protected\ekvdefNoVal{xister}{debug}{\xister@debug@true}
 \protected\ekvdefNoVal{xister}{horizontal}
   {%
@@ -568,16 +605,23 @@ and the derived files           xistercian.pdf
 % \end{macro}
 %
 % \begin{macro}{\cistercian}
+% \begin{macro}[internal]{\@cistercian}
 %   The macro is equivalent to other \LaTeX\ counter formatting macros, so we
 %   let it build the counter name and forward that to the canonically named
 %   auxiliary macro |\@cistercian|.
 %    \begin{macrocode}
 \newcommand\cistercian[1]{\expandafter\@cistercian\csname c@#1\endcsname}
 %    \end{macrocode}
+%   The internal just gets the current value of a counter and forwards it.
+%    \begin{macrocode}
+\newcommand\@cistercian[1]{\expandafter\cisterciannum\expandafter{\the#1}}
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
+%
 % \begin{macro}{\cisterciannum}
-% \begin{macro}[internal]{\cisterciannum@tex,\cisterciannum }
+% \begin{macro}[internal]{\cisterciannum@pdf}
 %    \begin{macrocode}
 \edef\cisterciannum
   {%
@@ -602,10 +646,10 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \protected\def\cistercianredraw
   {%
-    \let\xister@last@font\@empty
+    \def\xister@last@font{\xister@last@font}%
     \xister@ensure@current
   }
-\protected\def\cistercianredrawlazy{\let\xister@last@font\@empty}
+\protected\def\cistercianredrawlazy{\def\xister@last@font{\xister@last@font}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -631,13 +675,6 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \def\xister@count#1{\xister@gobbletoat#1\xister@count@done @+1\xister@count}
 \def\xister@count@done @+1\xister@count{\relax @}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[internal]{\@cistercian}
-%   Just get the current value of a counter and forward it.
-%    \begin{macrocode}
-\newcommand\@cistercian[1]{\expandafter\cisterciannum\expandafter{\the#1}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -910,13 +947,16 @@ and the derived files           xistercian.pdf
 \let\xister@drawdigits\xister@drawdigits@v
 %    \end{macrocode}
 %   Each digit has the same bounding box and baseline which is specified here.
-%   Also, the stroke width is set equal for each of the digits. |#1| will be the
-%   name, |#2| the digit specific path.
+%   |#1| will be the name, |#2| the digit specific path. We locally disable
+%   |\pgfsetcolor| to allow building colour-unsafe boxes. This only works as
+%   long as \pkg{luacolor} (or something equivalent) isn't used, so consider
+%   this a crude hack.
 %    \begin{macrocode}
 \newcommand\xister@drawdigit[2]
   {%
     \expandafter\setbox\csname xister@digitbox@#1\endcsname=\hbox
       {%
+        \let\pgfsetcolor\@gobble
         \begin{pgfpicture}%
           \pgfpathrectanglecorners
             {\pgfpoint{-\xister@bx\xister@X}{-\xister@by\xister@Y}}%
@@ -1042,11 +1082,7 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \protected\edef\xister@ensure@current
   {%
-    \unexpanded{\edef\xister@tmp}%
-      {%
-        \unexpanded{\f@size}:%
-        \unexpanded\expandafter{\csname\string\color@.\endcsname}%
-      }%
+    \unexpanded{\edef\xister@tmp{\xister@fontfeatures}}%
     \unexpanded{\unless\ifx\xister@tmp\xister@last@font}%
       \ifxister@debug@
         \unexpanded
@@ -1066,6 +1102,75 @@ and the derived files           xistercian.pdf
       }%
   }
 \AtBeginDocument{\xister@ensure@current}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@fontfeatures,\xister@add@fontfeature}
+%   This macro should store the different font features which should be kept
+%   track of. It will be redefined programmatically but the default is quite
+%   easy, just track the font size.
+%    \begin{macrocode}
+\protected\long\def\xister@add@fontfeature#1%
+  {%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx
+        \csname xister@add@fontfeature@\detokenize{#1}\endcsname
+        \relax
+      \PackageError{xistercian}{Unsupported font feature `\detokenize{#1}'.}{}%
+    \else
+      \csname xister@add@fontfeature@\detokenize{#1}\endcsname
+    \fi
+  }
+\def\xister@fontfeatures{\unexpanded\expandafter{\f@size}/}
+%    \end{macrocode}
+%   We know that the colour hack breaks if \pkg{luacolor} is loaded, so if that
+%   is found to be the case we add the |color| feature to the list of things we
+%   need to track. But we only want to add it if it's not yet in the list, so we
+%   run a check we borrow from \pkg{expl3}.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\AddToHook{begindocument/before}
+  {
+    \@ifpackageloaded { luacolor }
+      {
+        \exp_args:No \str_if_in:nnF \xister@fontfeatures { color }
+          { \xister@add@fontfeature{color} }
+      }
+      {}
+  }
+\ExplSyntaxOn
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {
+%     \xister@add@fontfeature@encoding,
+%     \xister@add@fontfeature@family,
+%     \xister@add@fontfeature@series,
+%     \xister@add@fontfeature@shape,
+%     \xister@add@fontfeature@size,
+%   }
+%   These macros all just add a specific macro to the list of things contained
+%   in |\xister@fontfeatures|, which determines what to consider deciding to
+%   redraw.
+%    \begin{macrocode}
+\def\xister@tmp#1#2%
+  {%
+    \protected\expandafter\def\csname xister@add@fontfeature@#2\endcsname
+      {%
+        \edef\xister@fontfeatures
+          {%
+            \unexpanded\expandafter
+              {\xister@fontfeatures\unexpanded\expandafter{#1}}/%
+          }%
+      }%
+  }
+\expandafter\xister@tmp\csname\string\color@.\endcsname{color}
+\xister@tmp\f@encoding{encoding}
+\xister@tmp\f@family  {family}
+\xister@tmp\f@series  {series}
+\xister@tmp\f@shape   {shape}
+\xister@tmp\f@size    {size}
 %    \end{macrocode}
 % \end{macro}
 %
