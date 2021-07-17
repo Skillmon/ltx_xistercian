@@ -278,8 +278,8 @@ and the derived files           xistercian.pdf
 %     \cs{cistercianstyle}\marg{name}\marg{key=value,\ldots}
 %   \end{syntax}
 %   With this macro you can define a key called \meta{name} that'll set the
-%   options in the \meta{key=value} list if used inside |\cisterciansetup|. Only
-%   new names are allowed.
+%   options in the \meta{key=value} list if used inside |\cisterciansetup|.
+%   Only new names are allowed.
 % \end{function}
 % For example, the key |horizontal| is equivalently defined to
 % \begin{verbatim}
@@ -322,15 +322,15 @@ and the derived files           xistercian.pdf
 %     bound-x = \marg{float} \mydefault{bx}
 %   \end{syntax}
 %   Specifies the factor the bounding box in $x$-direction is bigger than the
-%   |width|.
+%   |width|. An empty \meta{float} is considered the same as $1$.
 % \end{function}
 %
 % \begin{function}{bound-y,by}
 %   \begin{syntax}
-%     bound-y = \marg{float} \mydefault{by}
+%     bound-y = \marg{float} \mysdefault{\normalfont\emph{empty}}
 %   \end{syntax}
 %   Specifies the factor the bounding box in $y$-direction is bigger than the
-%   |height|.
+%   |height|. An empty \meta{float} is considered the same as $1$.
 % \end{function}
 %
 % \begin{function}{baseline,bs}
@@ -392,7 +392,7 @@ and the derived files           xistercian.pdf
 %   \meta{float}, or just pass in a divisor as an \meta{integer}, or both. An
 %   empty \meta{float} equals $1$.
 % \end{function}
-% Consider the following example (result on the right):\\
+% Consider the following example (result on the right):\\[\bigskipamount]
 % \begin{minipage}[c]{.8\linewidth}
 % \begin{verbatim}
 % {\cisterciansetup{fr=2/9,redraw}\cisterciannum{9}}\par
@@ -487,7 +487,8 @@ and the derived files           xistercian.pdf
 %     font = \marg{font setup} \mydefault{font}
 %   \end{syntax}
 %   Set the font which \pkg{xistercian} uses locally to evaluate the dimensions
-%   given to |width|, |height|, and |stroke|.
+%   given to |width|, |height|, and |stroke| (only font switches work here, you
+%   can't use stuff like |\texttt|, instead use |\ttfamily|).
 % \end{function}
 %
 % \begin{function}{redraw,r}
@@ -498,7 +499,7 @@ and the derived files           xistercian.pdf
 %     redraw!
 %   \end{syntax}
 %   Selects which font features to consider when deciding to redraw the glyphs.
-%   If one of the features have changed (or the features to consider) the glyphs
+%   If one of the features has changed (or the features to consider) the glyphs
 %   will be redrawn. This is especially handy if you change the |font| used
 %   while evaluating the given dimensions. The available features in the comma
 %   separated \meta{feature-list} are |encoding|, |family|, |series|, |shape|,
@@ -521,7 +522,8 @@ and the derived files           xistercian.pdf
 %     debug
 %   \end{syntax}
 %   Only usable as a package option. If this is used a bit of debugging
-%   information is printed in the log file and terminal.
+%   information is printed in the log file and terminal, and some keys try to
+%   evaluate the given argument on the spot instead of lazily.
 % \end{function}
 %
 %
@@ -588,14 +590,14 @@ and the derived files           xistercian.pdf
 \newcommand*\xister@x{.4em}
 \newcommand*\xister@y{1.55ex}
 \newcommand*\xister@bx{1.2}
-\newcommand*\xister@by{1.2}
+\newcommand*\xister@by{}
 \newcommand*\xister@bs{}
 \newcommand*\xister@font{\normalfont}
 \newcommand*\xister@five@dot{.09ex}
 \newcommand*\xister@five@dash{}
 \newcommand*\xister@share@div{/6}
 \newcommand*\xister@share@mul{}
-\newif\ifxister@debug@
+\newif\ifxister@dbg@
 \newif\ifxister@five@triangle@\xister@five@triangle@true
 \newif\ifxister@five@dot@
 \newdimen\xister@X
@@ -624,6 +626,15 @@ and the derived files           xistercian.pdf
 \expandafter\newsavebox\csname xister@digitbox@0\endcsname
 %    \end{macrocode}
 %
+% \begin{macro}[internal]{\xister@dbg@dim,\xister@dbg@float}
+%   These are initially just |\@gobble|, but the |debug| option might change
+%   things.
+%    \begin{macrocode}
+\let\xister@dbg@dim\@gobble
+\let\xister@dbg@float\@gobble
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsection{Options}
 %
@@ -636,21 +647,24 @@ and the derived files           xistercian.pdf
     \protected\long\ekvdef{xister}{#1}{#3}%
     \ekvletkv{xister}{#2}{xister}{#1}%
   }
-\xister@tmp{wd}{width}{\edef\xister@x{\unexpanded{#1}}}
-\xister@tmp{ht}{height}{\edef\xister@y{\unexpanded{#1}}}
-\xister@tmp{sv}{stroke-v}{\edef\xister@tv{\unexpanded{#1}}}
-\xister@tmp{sh}{stroke-h}{\edef\xister@th{\unexpanded{#1}}}
-\xister@tmp{sdu}{stroke-du}{\edef\xister@tdu{\unexpanded{#1}}}
-\xister@tmp{sdd}{stroke-dd}{\edef\xister@tdd{\unexpanded{#1}}}
-\xister@tmp{bx}{bound-x}{\edef\xister@bx{\unexpanded{#1}}}
-\xister@tmp{by}{bound-y}{\edef\xister@by{\unexpanded{#1}}}
-\xister@tmp{bs}{baseline}{\edef\xister@bs{\unexpanded{#1}}}
+\xister@tmp{wd}{width}{\edef\xister@x{\unexpanded{#1}}\xister@dbg@dim{#1}}
+\xister@tmp{ht}{height}{\edef\xister@y{\unexpanded{#1}}\xister@dbg@dim{#1}}
+\xister@tmp{sv}{stroke-v}{\edef\xister@tv{\unexpanded{#1}}\xister@dbg@dim{#1}}
+\xister@tmp{sh}{stroke-h}{\edef\xister@th{\unexpanded{#1}}\xister@dbg@dim{#1}}
+\xister@tmp{sdu}{stroke-du}
+  {\edef\xister@tdu{\unexpanded{#1}}\xister@dbg@dim{#1}}
+\xister@tmp{sdd}{stroke-dd}
+  {\edef\xister@tdd{\unexpanded{#1}}\xister@dbg@dim{#1}}
+\xister@tmp{bx}{bound-x}{\edef\xister@bx{\unexpanded{#1}}\xister@dbg@float{#1}}
+\xister@tmp{by}{bound-y}{\edef\xister@by{\unexpanded{#1}}\xister@dbg@float{#1}}
+\xister@tmp{bs}{baseline}{\edef\xister@bs{\unexpanded{#1}}\xister@dbg@float{#1}}
 \xister@tmp{s}{strokes}
   {%
     \edef\xister@tv{\unexpanded{#1}}%
     \let\xister@th\xister@tv
     \let\xister@tdu\xister@tv
     \let\xister@tdd\xister@tv
+    \xister@dbg@dim{#1}%
   }
 \xister@tmp{f}{font}{\edef\xister@font{\unexpanded{#1}}}
 \xister@tmp{o}{orientation}
@@ -670,6 +684,7 @@ and the derived files           xistercian.pdf
       {%
         \let\xister@share@div\@empty
         \edef\xister@share@mul{\unexpanded{#1}}%
+        \xister@dbg@float{#1}%
       }%
   }
 \xister@tmp{r}{redraw}
@@ -682,12 +697,14 @@ and the derived files           xistercian.pdf
     \xister@five@triangle@false
     \xister@five@dot@true
     \edef\xister@five@dot{\unexpanded{#1}}%
+    \xister@dbg@dim{#1}%
   }
 \protected\long\ekvdef{xister/5}{dash}
   {%
     \xister@five@triangle@false
     \xister@five@dot@false
     \edef\xister@five@dash{\unexpanded{#1}}%
+    \xister@dbg@float{#1}%
   }
 \protected\ekvdefNoVal{xister/5}{triangle}{\xister@five@triangle@true}
 \protected\ekvdefNoVal{xister/5}{dot}
@@ -703,7 +720,7 @@ and the derived files           xistercian.pdf
 \protected\ekvsetdef\xister@five@set{xister/5}
 \ekvlet{xister}{5}\xister@five@set
 \ekvlet{xister}{alternate-5}\xister@five@set
-\protected\ekvdefNoVal{xister}{debug}{\xister@debug@true}
+\let\xister@five@set\xister@undefined
 \protected\ekvdefNoVal{xister}{r!}{\cistercianredraw}
 \protected\ekvdefNoVal{xister}{r} {\cistercianredrawlazy}
 \ekvletkvNoVal{xister}{redraw} {xister}{r}
@@ -719,6 +736,30 @@ and the derived files           xistercian.pdf
     \let\xister@build\xister@build@vertical
     \def\xister@x{.4em}%
     \def\xister@y{1.55ex}%
+  }
+%    \end{macrocode}
+% The |debug| option redefines the debug macros to the correct definition.
+%    \begin{macrocode}
+\protected\ekvdefNoVal{xister}{debug}
+  {%
+    \xister@dbg@true
+    \protected\long\def\xister@dbg@dim##1%
+      {%
+        \typeout
+          {%
+            Package xistercian Debug: Trying to use dimension
+            `\unexpanded{##1}'.%
+          }%
+        \xister@TMPA=\dimexpr##1\relax
+        \typeout{Package xistercian Debug: Done.}%
+      }%
+    \protected\long\def\xister@dbg@float##1%
+      {%
+        \typeout
+          {Package xistercian Debug: Trying to use float `\unexpanded{##1}'.}%
+        \xister@TMPA=##1\z@
+        \typeout{Package xistercian Debug: Done.}%
+      }%
   }
 %    \end{macrocode}
 % and parse the package options (and since the used names |width|, |height|, and
@@ -1025,7 +1066,7 @@ and the derived files           xistercian.pdf
             {\xister@five@dot}%
           \pgfusepath{fill}%
         \else
-          \xister@TMPB=\dimexpr\xister@X\ifdim\xister@X<\z@+\else-\fi\xister@Tv\relax
+          \xister@TMPB=\dimexpr\xister@X-#3\xister@Tv\relax
           \pgfsetlinewidth{2\xister@Tv}%
           \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
           \pgfpathlineto
@@ -1316,12 +1357,12 @@ and the derived files           xistercian.pdf
   {%
     \unexpanded{\edef\xister@tmp{\xister@fontfeatures}}%
     \unexpanded{\unless\ifx\xister@tmp\xister@last@font}%
-      \ifxister@debug@
+      \ifxister@dbg@
         \unexpanded
           {%
             \typeout
               {%
-                Package xistercian Info: Font changed. Building glyphs for
+                Package xistercian Debug: Font changed. Building glyphs for
                 \xister@tmp.
               }%
           }%
@@ -1330,8 +1371,11 @@ and the derived files           xistercian.pdf
       {%
           \let\xister@last@font\xister@tmp
           \xister@build
-        \fi
       }%
+      \ifxister@dbg@
+        \unexpanded{\typeout{Package xistercian Debug: Done.}}%
+      \fi
+    \unexpanded{\fi}%
   }
 \AtBeginDocument{\xister@ensure@current}
 %    \end{macrocode}
