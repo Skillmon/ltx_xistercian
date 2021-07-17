@@ -40,22 +40,20 @@ uploadconfig  = {
   version     = pkgversion .. " " .. pkgdate,
   license     = "lppl1.3c",
   summary     = "Cistercian numerals in LaTeX",
-  topic       = "keyval",
-  ctanPath    = "/macros/generic/expkv",
+  topic       = "numbers",
+  ctanPath    = "/macros/latex/contrib/expkv",
   repository  = "https://github.com/Skillmon/ltx_xistercian",
   bugtracker  = "https://github.com/Skillmon/ltx_xistercian/issues",
   update      = true,
   description = [[
-`expkv` is a minimalistic but fast and expandable key=val implementation.
-It provides two parsing macros:
+`xistercian` allows you to use Cistercian numerals in LaTeX. The glyphs are
+created using PGF and to a certain degree configurable.
 
-* `\ekvset{<set>}{<key=val list>}` which is comparable to `keyval`'s `\setkeys`
+You can use Cistercian numerals as page numbers using
+`\pagenumbering{cistercian}`. The two main macros are:
 
-* `\ekvparse<cs1><cs2>{<key=val list>}` which can be used inside `\expanded` and
-expands to `<cs1>{key}` and `<cs2>{key}{val}` for the entries in the
-`<key=val list>`.
-
-`expkv` has predictable brace-stripping behaviour and handles commas and equal
-signs with category codes 12 and 13 correctly.
+- `\cistercian{<counter>}` formats the LaTeX2e counter as a Cistercian numeral
+- `\cisterciannum{<integer>}` formats the integer (given as a string) as a
+  Cistercian numeral
   ]]
 }
