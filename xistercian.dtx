@@ -191,7 +191,7 @@ and the derived files           xistercian.pdf
 % \begin{figure}
 %   \centering
 %   \small
-%   \cisterciansetup{o=h,ht=1ex,wd=.7em}\cistercianredraw
+%   \cisterciansetup{horizontal}\cistercianredraw
 %   \begin{tabular}{*9c}
 %     \examplerow{}
 %     \examplerow{0}
@@ -218,160 +218,6 @@ and the derived files           xistercian.pdf
 % instance $-12345678$ is displayed as \cistexnum{-12345678}. And in the seldom
 % case that four consecutive digits are zeros they get displayed as that:
 % \cistexnum{10000} is $10000$.
-%
-%
-% \subsection{Options}
-%
-% The options described here are all usable as package options (except when
-% explicitly stated otherwise). \pkg{xistercian} doesn't parse the global
-% options provided to the documentclass. Additionally you can change the
-% options (except for the |debug| option) using |\cisterciansetup|.
-%
-% For the options |width| and |height|, and probably also the strokes, you
-% should use dimensions using |ex| or |em| to get sizes depending on the current
-% font size. For all three of those options the \meta{dimension expression} is
-% evaluated (using the setup specified in |font|) every time the font changed
-% according to the |redraw| option's feature list (by default only when the size
-% changed) since the last time a they were drawn.
-%
-% Initial values if present are printed on the right.
-%
-% \begin{function}{width,wd}
-%   \begin{syntax}
-%     width = \marg{dimension expression} \mydefault{x}
-%   \end{syntax}
-%   Set the width of the Cistercian numeral digits.
-% \end{function}
-%
-% \begin{function}{height,ht}
-%   \begin{syntax}
-%     height = \marg{dimension expression} \mydefault{y}
-%   \end{syntax}
-%   Set the height of the Cistercian numeral digits.
-% \end{function}
-%
-% \begin{function}{bound-x,bx}
-%   \begin{syntax}
-%     bound-x = \marg{factor} \mydefault{bx}
-%   \end{syntax}
-%   Specifies the factor of the bounding box relative to the |width| in
-%   $x$-direction.
-% \end{function}
-%
-% \begin{function}{bound-y,by}
-%   \begin{syntax}
-%     bound-y = \marg{factor} \mydefault{by}
-%   \end{syntax}
-%   Specifies the factor of the bounding box relative to the |height| in
-%   $y$-direction.
-% \end{function}
-%
-% \begin{function}{baseline,bs}
-%   \begin{syntax}
-%     baseline = \marg{factor} \mysdefault{\normalfont\emph{empty}}
-%   \end{syntax}
-%   Sets the baseline of the symbols in multiples of the negative height. $1$
-%   (or empty) results in the symbol starting on the surrounding baseline,
-%   bigger values shift it downwards, smaller values upwards.
-% \end{function}
-%
-% \begin{function}{stroke-v,sv}
-%   \begin{syntax}
-%     stroke-v = \marg{dimension expression} \mydefault{tv}
-%   \end{syntax}
-%   Sets the stroke thickness of vertical strokes.
-% \end{function}
-%
-% \begin{function}{stroke-h,sh}
-%   \begin{syntax}
-%     stroke-h = \marg{dimension expression} \mydefault{th}
-%   \end{syntax}
-%   Sets the stroke thickness of horizontal strokes.
-% \end{function}
-%
-% \begin{function}{stroke-du,sdu}
-%   \begin{syntax}
-%     stroke-du = \marg{dimension expression} \mydefault{tdu}
-%   \end{syntax}
-%   Sets the stroke thickness of diagonal strokes going from lower left to upper
-%   right.
-% \end{function}
-%
-% \begin{function}{stroke-dd,sdd}
-%   \begin{syntax}
-%     stroke-dd = \marg{dimension expression} \mydefault{tdd}
-%   \end{syntax}
-%   Sets the stroke thickness of diagonal strokes going from upper left to lower
-%   right.
-% \end{function}
-%
-% \begin{function}{strokes,s}
-%   \begin{syntax}
-%     stroke = \marg{dimension expression}
-%   \end{syntax}
-%   Sets all stroke thicknesses at once.
-% \end{function}
-%
-% \begin{function}{orientation,o}
-%   \begin{syntax}
-%     orientation = \marg{choice} \mysdefault{vertical}
-%   \end{syntax}
-%   Sets the orientation of the Cistercian numerals. Choices are |horizontal|
-%   (or |h| for short) or |vertical| (or |v| for short). You'll most likely want
-%   to change the |width| and |height| of the symbols if you decide to change
-%   this.
-% \end{function}
-%
-% \begin{function}{horizontal}
-%   \begin{syntax}
-%     horizontal
-%   \end{syntax}
-%   Same as setting |orientation = horizontal|.
-% \end{function}
-%
-% \begin{function}{vertical}
-%   \begin{syntax}
-%     vertical
-%   \end{syntax}
-%   Same as setting |orientation = vertical|.
-% \end{function}
-%
-% \begin{function}{font,f}
-%   \begin{syntax}
-%     font = \marg{font setup} \mydefault{font}
-%   \end{syntax}
-%   Set the font which \pkg{xistercian} uses locally to evaluate the dimensions
-%   given to |width|, |height|, and |stroke|.
-% \end{function}
-%
-% \begin{function}{redraw,r}
-%   \begin{syntax}
-%     redraw = \marg{feature-list} \mysdefault{size}
-%     redraw += \marg{feature-list}
-%   \end{syntax}
-%   Selects which font features to consider when deciding to redraw the glyphs.
-%   If one of the features have changed (or the features to consider) the glyphs
-%   will be redrawn. This is especially handy if you change the |font| used
-%   while evaluating the given dimensions. The available features in the comma
-%   separated \meta{feature-list} are |encoding|, |family|, |series|, |shape|,
-%   |size|, and |color|.
-%
-%   If you see that a Cistercian numeral doesn't have the correct colour of the
-%   surrounding text you need to add |color| to the font features
-%   (\pkg{xistercian} uses some hack to get the boxed glyphs to respect the
-%   surrounding colour, but that hack might fail in certain circumstances).
-%
-%   If you use the |+|~variant of this option the \meta{feature-list} is added
-%   to the existing features, else they overwrite any existing configuration.
-% \end{function}
-%
-% \begin{function}{debug}
-%   \begin{syntax}
-%     debug
-%   \end{syntax}
-%   Only usable as a package option. If this is used a bit of debugging
-%   information is printed in the log file and terminal.
-% \end{function}
 %
 %
 % \subsection{Macros}
@@ -425,6 +271,257 @@ and the derived files           xistercian.pdf
 %   multiple times (if Cistercian numerals are used in different nested groups),
 %   while the normal variant might result in the glyphs being redrawn too
 %   eagerly.
+% \end{function}
+%
+% \begin{function}{\cistercianstyle}
+%   \begin{syntax}
+%     \cs{cistercianstyle}\marg{name}\marg{key=value,\ldots}
+%   \end{syntax}
+%   With this macro you can define a key called \meta{name} that'll set the
+%   options in the \meta{key=value} list if used inside |\cisterciansetup|. Only
+%   new names are allowed.
+% \end{function}
+% For example, the key |horizontal| is equivalently defined to
+% \begin{verbatim}
+% \cistercianstyle{horizontal}{o=h,wd=0.62em,ht=1ex}
+% \end{verbatim}
+%
+%
+% \subsection{Options}
+%
+% The options described here are all usable as package options (except when
+% explicitly stated otherwise). \pkg{xistercian} doesn't parse the global
+% options provided to the documentclass. Additionally you can change the
+% options (except for the |debug| option) using |\cisterciansetup|.
+%
+% For the options |width| and |height|, and probably also the strokes, you
+% should use dimensions using |ex| or |em| to get sizes depending on the current
+% font size. For all three of those options the \meta{dimension expression} is
+% evaluated (using the setup specified in |font|) every time the font changed
+% according to the |redraw| option's feature list (by default only when the size
+% changed) since the last time they were drawn.
+%
+% Initial values if present are printed on the right.
+%
+% \begin{function}{width,wd}
+%   \begin{syntax}
+%     width = \marg{dimension expression} \mydefault{x}
+%   \end{syntax}
+%   Set the width of the Cistercian numeral digits.
+% \end{function}
+%
+% \begin{function}{height,ht}
+%   \begin{syntax}
+%     height = \marg{dimension expression} \mydefault{y}
+%   \end{syntax}
+%   Set the height of the Cistercian numeral digits.
+% \end{function}
+%
+% \begin{function}{bound-x,bx}
+%   \begin{syntax}
+%     bound-x = \marg{float} \mydefault{bx}
+%   \end{syntax}
+%   Specifies the factor the bounding box in $x$-direction is bigger than the
+%   |width|.
+% \end{function}
+%
+% \begin{function}{bound-y,by}
+%   \begin{syntax}
+%     bound-y = \marg{float} \mydefault{by}
+%   \end{syntax}
+%   Specifies the factor the bounding box in $y$-direction is bigger than the
+%   |height|.
+% \end{function}
+%
+% \begin{function}{baseline,bs}
+%   \begin{syntax}
+%     baseline = \marg{float} \mysdefault{\normalfont\emph{empty}}
+%   \end{syntax}
+%   Sets the baseline of the symbols in multiples of the negative height. $1$
+%   (or empty) results in the symbol starting on the surrounding baseline,
+%   bigger values shift the symbols upwards, smaller values downwards.
+% \end{function}
+%
+% \begin{function}{stroke-v,sv}
+%   \begin{syntax}
+%     stroke-v = \marg{dimension expression} \mydefault{tv}
+%   \end{syntax}
+%   Sets the stroke thickness of vertical strokes.
+% \end{function}
+%
+% \begin{function}{stroke-h,sh}
+%   \begin{syntax}
+%     stroke-h = \marg{dimension expression} \mydefault{th}
+%   \end{syntax}
+%   Sets the stroke thickness of horizontal strokes.
+% \end{function}
+%
+% \begin{function}{stroke-du,sdu}
+%   \begin{syntax}
+%     stroke-du = \marg{dimension expression} \mydefault{tdu}
+%   \end{syntax}
+%   Sets the stroke thickness of diagonal strokes going from lower left to upper
+%   right.
+% \end{function}
+%
+% \begin{function}{stroke-dd,sdd}
+%   \begin{syntax}
+%     stroke-dd = \marg{dimension expression} \mydefault{tdd}
+%   \end{syntax}
+%   Sets the stroke thickness of diagonal strokes going from upper left to lower
+%   right.
+% \end{function}
+%
+% \begin{function}{strokes,s}
+%   \begin{syntax}
+%     stroke = \marg{dimension expression}
+%   \end{syntax}
+%   Sets all stroke thicknesses at once.
+% \end{function}
+%
+% \begin{function}{fraction,fr}
+%   \begin{syntax}
+%     fraction = \marg{float} \mysdefault{/6}
+%     fraction = \marg{float}/\marg{integer}
+%   \end{syntax}
+%   The Cistercian digits are drawn only in a fraction of the total bounding box
+%   of each symbol. The ones are drawn (with vertical Cistercians) in the upper
+%   right rectangle. The width of that rectangle is determined by |width|, and
+%   the upper border by |height|, and with this option you can set the lower
+%   border as a fraction of the |height|. You can either just give a factor as a
+%   \meta{float}, or just pass in a divisor as an \meta{integer}, or both. An
+%   empty \meta{float} equals $1$.
+% \end{function}
+% Consider the following example (result on the right):\\
+% \begin{minipage}[c]{.8\linewidth}
+% \begin{verbatim}
+% {\cisterciansetup{fr=2/9,redraw}\cisterciannum{9}}\par
+% {\cisterciansetup{fr=0.6,redraw}\cisterciannum{9}}\par
+% \end{verbatim}
+% \end{minipage}
+% \begin{minipage}[c]{1em}
+% {\cisterciansetup{fr=2/9,redraw}\cisterciannum{9}}\par
+% {\cisterciansetup{fr=0.6,redraw}\cisterciannum{9}}\par
+% \end{minipage}
+%
+% \begin{function}{orientation,o}
+%   \begin{syntax}
+%     orientation = \marg{choice} \mysdefault{vertical}
+%   \end{syntax}
+%   Sets the orientation of the Cistercian numerals. Choices are |horizontal|
+%   (or |h| for short) or |vertical| (or |v| for short). You'll most likely want
+%   to change the |width| and |height| of the symbols if you decide to change
+%   this.
+% \end{function}
+%
+% \begin{function}{horizontal}
+%   \begin{syntax}
+%     horizontal
+%   \end{syntax}
+%   Same as setting |orientation = horizontal, width = 0.62em, height = 1ex|.
+% \end{function}
+%
+% \begin{function}{vertical}
+%   \begin{syntax}
+%     vertical
+%   \end{syntax}
+%   Same as setting |orientation = vertical, width = 0.4em, height = 1.55ex|.
+% \end{function}
+%
+% \begin{function}{alternate-5,5}
+%   \begin{syntax}
+%     alternate-5 = \marg{choice} \mysdefault{triangle}
+%   \end{syntax}
+%   There are alternative forms of the digit $5$, while the most often used one
+%   nowadays seems to be the |triangle| form, this package also supports two
+%   other variants. Those are called |dot| and |dash|. While if you choose
+%   |triangle| you can't give an additional value, if your choice is |dot| or
+%   |dash| you can customise those using a second equals sign and some value. If
+%   you don't customise them they use their respective initial value (or last
+%   value if you changed the value at some point in time).
+%
+%   For |dot| you can also specify the radius as a dimension. The default is
+%   \mbox{\mydefault{five@dot}}.
+%
+%   For |dash| you can specify the length of the dash in multiples of the used
+%   stroke thickness (which might differ for the horizontal and vertical
+%   symbols), an empty value is consider the same as $1$. The default is
+%   \mbox{\mysdefault{\normalfont\emph{empty}}}.
+%
+%   A comparison of the three alternate forms is shown in
+%   figure~\ref{fig:fives}.
+% \end{function}
+%
+% \begin{figure}
+%   \centering
+%   \def\showbb#1{^^A
+%       \begingroup
+%       \cisterciansetup{#1}\cistercianredraw
+%       \fboxrule=.5pt
+%       \fboxsep=-.5\fboxrule
+%       \leavevmode
+%       \rlap{\textcolor{red}{\fbox{\phantom{\cisterciannum{5555}}}}}^^A
+%       \kern.5\fboxrule\cisterciannum{5555}\kern.5\fboxrule^^A
+%       \endgroup
+%     }^^A
+%   \cisterciansetup{bx=1,by=1,wd=1cm,ht=2cm,sv=3pt,sdd=3pt,sh=2pt,sdu=2pt}
+%   \cistercianstyle{hexample}{o=h,ht=1cm,wd=2cm}
+%   \begin{tabular}{*5c}
+%     \texttt{triangle} &
+%     \texttt{dot=2pt}  & \texttt{dot=4pt} &
+%     \texttt{dash=1}   & \texttt{dash=3}  \\
+%     \showbb{5=triangle} &
+%     \showbb{5=dot=2pt}  & \showbb{5=dot=4pt} &
+%     \showbb{5=dash=1}   & \showbb{5=dash=3}  \\
+%     \showbb{5=triangle,hexample} &
+%     \showbb{5=dot=2pt,hexample}  & \showbb{5=dot=4pt,hexample} &
+%     \showbb{5=dash=1,hexample}   & \showbb{5=dash=3,hexample}
+%   \end{tabular}
+%   \caption[Alternate forms of the digit $5$]
+%     {Alternate forms of the digit $5$. The tight bounding
+%      boxes using \texttt{bx=1,by=1} are drawn red.\label{fig:fives}}
+% \end{figure}
+%
+% \begin{function}{font,f}
+%   \begin{syntax}
+%     font = \marg{font setup} \mydefault{font}
+%   \end{syntax}
+%   Set the font which \pkg{xistercian} uses locally to evaluate the dimensions
+%   given to |width|, |height|, and |stroke|.
+% \end{function}
+%
+% \begin{function}{redraw,r}
+%   \begin{syntax}
+%     redraw = \marg{feature-list} \mysdefault{size}
+%     redraw += \marg{feature-list}
+%     redraw
+%     redraw!
+%   \end{syntax}
+%   Selects which font features to consider when deciding to redraw the glyphs.
+%   If one of the features have changed (or the features to consider) the glyphs
+%   will be redrawn. This is especially handy if you change the |font| used
+%   while evaluating the given dimensions. The available features in the comma
+%   separated \meta{feature-list} are |encoding|, |family|, |series|, |shape|,
+%   |size|, and |color|.
+%
+%   If you see that a Cistercian numeral doesn't have the correct colour of the
+%   surrounding text you need to add |color| to the font features
+%   (\pkg{xistercian} uses some hack to get the boxed glyphs to respect the
+%   surrounding colour, but that hack might fail in certain circumstances).
+%
+%   If you use the |+=|~variant of this option the \meta{feature-list} is added
+%   to the existing features, else they overwrite any existing configuration.
+%
+%   Without a value the key will issue |\cistercianredrawlazy|, and if you use
+%   the |!|~variant it'll use |\cistercianredraw|.
+% \end{function}
+%
+% \begin{function}{debug}
+%   \begin{syntax}
+%     debug
+%   \end{syntax}
+%   Only usable as a package option. If this is used a bit of debugging
+%   information is printed in the log file and terminal.
 % \end{function}
 %
 %
@@ -494,9 +591,16 @@ and the derived files           xistercian.pdf
 \newcommand*\xister@by{1.2}
 \newcommand*\xister@bs{}
 \newcommand*\xister@font{\normalfont}
+\newcommand*\xister@five@dot{.09ex}
+\newcommand*\xister@five@dash{}
+\newcommand*\xister@share@div{/6}
+\newcommand*\xister@share@mul{}
 \newif\ifxister@debug@
+\newif\ifxister@five@triangle@\xister@five@triangle@true
+\newif\ifxister@five@dot@
 \newdimen\xister@X
 \newdimen\xister@Y
+\newdimen\xister@XY@share
 \newdimen\xister@Th
 \newdimen\xister@Tv
 \newdimen\xister@Tdu
@@ -552,33 +656,69 @@ and the derived files           xistercian.pdf
 \xister@tmp{o}{orientation}
   {%
     \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname xister@drawdigits@#1\endcsname\relax
+    \expandafter\ifx\csname xister@build@#1\endcsname\relax
       \PackageError{xister}%
         {Unaccepted orientation. Choices are horizontal/h or vertical/v}{}%
     \else
-      \expandafter\let\expandafter
-        \xister@drawdigits
-        \csname xister@drawdigits@#1\endcsname
-      \expandafter\let\expandafter
-        \xister@drawzero
-        \csname xister@drawzero@#1\endcsname
+      \expandafter\let\expandafter\xister@build\csname xister@build@#1\endcsname
     \fi
+  }
+\xister@tmp{fr}{fraction}
+  {%
+    \xister@if@slash{#1}%
+      {\xister@fraction#1\xister@stop}%
+      {%
+        \let\xister@share@div\@empty
+        \edef\xister@share@mul{\unexpanded{#1}}%
+      }%
   }
 \xister@tmp{r}{redraw}
   {\let\xister@fontfeatures\@empty\ekvcsvloop\xister@add@fontfeature{#1}}
 \xister@tmp{r+}{redraw+}{\ekvcsvloop\xister@add@fontfeature{#1}}
 \ekvletkv{xister}{r +}{xister}{r+}
 \ekvletkv{xister}{redraw +}{xister}{redraw+}
+\protected\long\ekvdef{xister/5}{dot}
+  {%
+    \xister@five@triangle@false
+    \xister@five@dot@true
+    \edef\xister@five@dot{\unexpanded{#1}}%
+  }
+\protected\long\ekvdef{xister/5}{dash}
+  {%
+    \xister@five@triangle@false
+    \xister@five@dot@false
+    \edef\xister@five@dash{\unexpanded{#1}}%
+  }
+\protected\ekvdefNoVal{xister/5}{triangle}{\xister@five@triangle@true}
+\protected\ekvdefNoVal{xister/5}{dot}
+  {%
+    \xister@five@triangle@false
+    \xister@five@dot@true
+  }
+\protected\ekvdefNoVal{xister/5}{dash}
+  {%
+    \xister@five@triangle@false
+    \xister@five@dot@false
+  }
+\protected\ekvsetdef\xister@five@set{xister/5}
+\ekvlet{xister}{5}\xister@five@set
+\ekvlet{xister}{alternate-5}\xister@five@set
 \protected\ekvdefNoVal{xister}{debug}{\xister@debug@true}
+\protected\ekvdefNoVal{xister}{r!}{\cistercianredraw}
+\protected\ekvdefNoVal{xister}{r} {\cistercianredrawlazy}
+\ekvletkvNoVal{xister}{redraw} {xister}{r}
+\ekvletkvNoVal{xister}{redraw!}{xister}{r!}
 \protected\ekvdefNoVal{xister}{horizontal}
   {%
-    \let\xister@drawdigits\xister@drawdigits@horizontal
-    \let\xister@drawzero\xister@drawzero@horizontal
+    \let\xister@build\xister@build@horizontal
+    \def\xister@x{.62em}%
+    \def\xister@y{1ex}%
   }
 \protected\ekvdefNoVal{xister}{vertical}
   {%
-    \let\xister@drawdigits\xister@drawdigits@vertical
-    \let\xister@drawzero\xister@drawzero@vertical
+    \let\xister@build\xister@build@vertical
+    \def\xister@x{.4em}%
+    \def\xister@y{1.55ex}%
   }
 %    \end{macrocode}
 % and parse the package options (and since the used names |width|, |height|, and
@@ -601,6 +741,20 @@ and the derived files           xistercian.pdf
 %   Just as a simple way to pick options later on.
 %    \begin{macrocode}
 \protected\ekvsetdef\cisterciansetup{xister}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\cistercianstyle}
+%   We allow users to define a style they can call with a single key name inside
+%   |\cisterciansetup|. To achieve that we just define a |NoVal| key that'll
+%   call a nested |\cisterciansetup|.
+%    \begin{macrocode}
+\protected\long\def\cistercianstyle#1#2%
+  {%
+    \ekvifdefinedNoVal{xister}{#1}%
+      {\PackageError{xistercian}{Key `#1' already defined}{}}%
+      {\protected\ekvdefNoVal{xister}{#1}{\cisterciansetup{#2}}}%
+  }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -696,6 +850,27 @@ and the derived files           xistercian.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\xister@if@slash}
+%   We need to test whether a slash is inside an argument to parse some user
+%   option. Since this isn't needed inside an inner loop we don't create an
+%   optimised version and only borrow a generic \pkg{expl3} function.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\cs_new_protected:Npn \xister@if@slash #1 { \tl_if_in:nnTF {#1} { / } }
+\ExplSyntaxOff
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@fraction}
+%    \begin{macrocode}
+\protected\long\def\xister@fraction#1/#2\xister@stop
+  {%
+    \edef\xister@share@mul{\unexpanded{#1}}%
+    \edef\xister@share@div{/\unexpanded{#2}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsubsection{Input Parsing}
 %
@@ -787,12 +962,7 @@ and the derived files           xistercian.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]
-%   {
-%     \xister@drawdigits,
-%     \xister@drawdigits@v,\xister@drawdigits@vertical
-%     \xister@drawdigits@h,\xister@drawdigits@horizontal
-%     \xister@drawdigit
-%   }
+%   {\xister@drawdigits@vertical,\xister@drawdigits@horizontal}
 %   The digit glyphs. Since each numeral is build from the zero stem and some
 %   appendix to it this only specifies the form of the appendices. The zero stem
 %   is defined a bit down the road. |#1| will determine the decade, and |#2|
@@ -800,6 +970,7 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \newcommand\xister@drawdigits@vertical[3]
   {%
+    \xister@XY@share=\dimexpr\xister@share@mul\xister@Y\xister@share@div\relax
     \xister@drawdigit{1#1}%
       {%
         \pgfsetlinewidth{2\xister@Th}%
@@ -810,48 +981,67 @@ and the derived files           xistercian.pdf
     \xister@drawdigit{2#1}%
       {%
         \pgfsetlinewidth{2\xister@Th}%
-        \xister@TMPA=\dimexpr\xister@Y/6+#2\xister@Th\relax
+        \xister@TMPA=\dimexpr\xister@XY@share+#2\xister@Th\relax
         \pgfpathmoveto{\pgfpoint\z@\xister@TMPA}%
         \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
       }%
     \xister@drawdigit{3#1}%
       {%
-        \xister@TMPA=\dimexpr\xister@Y/6\relax
-        \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdd\relax
-        \xister@clip@v\xister@TMPA
+        \xister@TMPB=#3\dimexpr\xister@Tv-\xister@Tdd\relax
+        \xister@clip@v\xister@XY@share
         \pgfsetlinewidth{2\xister@Tdd}%
-        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@TMPA}%
+        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@XY@share}%
         \pgfpathlineto{\pgfpoint\xister@TMPB\xister@Y}%
-        \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
+        \pgfpathlineto{\pgfpoint\xister@X\xister@XY@share}%
       }%
     \xister@drawdigit{4#1}%
       {%
         \xister@clip@v\z@
-        \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdu\relax
+        \xister@TMPB=#3\dimexpr\xister@Tv-\xister@Tdu\relax
         \pgfsetlinewidth{2\xister@Tdu}%
         \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
-        \pgfpathlineto{\pgfpoint\xister@TMPB{\dimexpr\xister@Y/6\relax}}%
+        \pgfpathlineto{\pgfpoint\xister@TMPB\xister@XY@share}%
         \pgfpathlineto{\pgfpoint\xister@X\xister@Y}%
       }%
     \xister@drawdigit{5#1}%
       {%
-        \xister@clip@v\z@
-        \xister@TMPB=\ifdim\xister@X<\z@-\fi\dimexpr\xister@Tv-\xister@Tdu\relax
-        \pgfsetlinewidth{2\xister@Tdu}%
-        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
-        \pgfpathlineto{\pgfpoint\xister@TMPB{\dimexpr\xister@Y/6\relax}}%
-        \pgfpathlineto{\pgfpoint\xister@X\xister@Y}%
-        \pgfusepath{stroke,clip}%
-        \pgfsetlinewidth{2\xister@Th}%
-        \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@Th\relax
-        \pgfpathmoveto{\pgfpoint\z@\xister@TMPA}%
-        \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
+        \ifxister@five@triangle@
+          \xister@clip@v\z@
+          \xister@TMPB=%
+            #3\dimexpr\xister@Tv-\xister@Tdu\relax
+          \pgfsetlinewidth{2\xister@Tdu}%
+          \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
+          \pgfpathlineto{\pgfpoint\xister@TMPB\xister@XY@share}%
+          \pgfpathlineto{\pgfpoint\xister@X\xister@Y}%
+          \pgfusepath{stroke,clip}%
+          \pgfsetlinewidth{2\xister@Th}%
+          \xister@TMPA=\dimexpr\xister@Y\xister@sgn\xister@Th\relax
+          \pgfpathmoveto{\pgfpoint\z@\xister@TMPA}%
+          \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
+        \else\ifxister@five@dot@
+          \pgfpathcircle
+            {\pgfpoint{\dimexpr\xister@X-#3\xister@five@dot\relax}%
+                      {\dimexpr\xister@Y-#2\xister@five@dot\relax}}%
+            {\xister@five@dot}%
+          \pgfusepath{fill}%
+        \else
+          \xister@TMPB=\dimexpr\xister@X\ifdim\xister@X<\z@+\else-\fi\xister@Tv\relax
+          \pgfsetlinewidth{2\xister@Tv}%
+          \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
+          \pgfpathlineto
+            {%
+              \pgfpoint
+                \xister@TMPB
+                {\dimexpr\xister@Y-#2\xister@five@dash\xister@Tv*2\relax}%
+            }%
+        \fi\fi
       }%
     \xister@drawdigit{6#1}%
       {%
         \pgfsetlinewidth{2\xister@Tv}%
-        \pgfpathmoveto{\pgfpoint\xister@X\xister@Y}%
-        \pgfpathlineto{\pgfpoint\xister@X{\dimexpr\xister@Y/6\relax}}%
+        \xister@TMPB=\dimexpr\xister@X-#3\xister@Tv\relax
+        \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
+        \pgfpathlineto{\pgfpoint\xister@TMPB\xister@XY@share}%
       }%
     \xister@superimpose{7#1}%
       {%
@@ -872,6 +1062,7 @@ and the derived files           xistercian.pdf
   }
 \newcommand\xister@drawdigits@horizontal[3]
   {%
+    \xister@XY@share=-\dimexpr\xister@share@mul\xister@X\xister@share@div\relax
     \xister@drawdigit{1#1}%
       {%
         \pgfsetlinewidth{2\xister@Tv}%
@@ -882,48 +1073,66 @@ and the derived files           xistercian.pdf
     \xister@drawdigit{2#1}%
       {%
         \pgfsetlinewidth{2\xister@Tv}%
-        \xister@TMPA=-\dimexpr\xister@X/6+#3\xister@Th\relax
+        \xister@TMPA=-\dimexpr#3\xister@Th-\xister@XY@share\relax
         \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
         \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
       }%
     \xister@drawdigit{3#1}%
       {%
-        \xister@TMPA=-\dimexpr\xister@X/6\relax
-        \xister@TMPB=\ifdim\xister@Y<\z@-\fi\dimexpr\xister@Th-\xister@Tdu\relax
-        \xister@clip@h\xister@TMPA
+        \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdu\relax
+        \xister@clip@h\xister@XY@share
         \pgfsetlinewidth{2\xister@Tdu}%
-        \pgfpathmoveto{\pgfpoint\xister@TMPA\xister@TMPB}%
+        \pgfpathmoveto{\pgfpoint\xister@XY@share\xister@TMPB}%
         \pgfpathlineto{\pgfpoint{-\xister@X}\xister@TMPB}%
-        \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
+        \pgfpathlineto{\pgfpoint\xister@XY@share\xister@Y}%
       }%
     \xister@drawdigit{4#1}%
       {%
         \xister@clip@h\z@
-        \xister@TMPB=\ifdim\xister@Y<\z@-\fi\dimexpr\xister@Th-\xister@Tdd\relax
+        \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdd\relax
         \pgfsetlinewidth{2\xister@Tdd}%
         \pgfpathmoveto{\pgfpoint\xister@X\xister@TMPB}%
-        \pgfpathlineto{\pgfpoint{-\dimexpr\xister@X/6\relax}\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint\xister@XY@share\xister@TMPB}%
         \pgfpathlineto{\pgfpoint{-\xister@X}\xister@Y}%
       }%
     \xister@drawdigit{5#1}%
       {%
-        \xister@clip@h\z@
-        \xister@TMPB=\ifdim\xister@Y<\z@-\fi\dimexpr\xister@Th-\xister@Tdd\relax
-        \pgfsetlinewidth{2\xister@Tdd}%
-        \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
-        \pgfpathlineto{\pgfpoint{-\dimexpr\xister@X/6\relax}\xister@TMPB}%
-        \pgfpathlineto{\pgfpoint{-\xister@X}\xister@Y}%
-        \pgfusepath{stroke,clip}%
-        \pgfsetlinewidth{2\xister@Tv}%
-        \xister@TMPA=-\dimexpr\xister@X-#3\xister@Tv\relax
-        \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
-        \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
+        \ifxister@five@triangle@
+          \xister@clip@h\z@
+          \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdd\relax
+          \pgfsetlinewidth{2\xister@Tdd}%
+          \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
+          \pgfpathlineto{\pgfpoint\xister@XY@share\xister@TMPB}%
+          \pgfpathlineto{\pgfpoint{-\xister@X}\xister@Y}%
+          \pgfusepath{stroke,clip}%
+          \pgfsetlinewidth{2\xister@Tv}%
+          \xister@TMPA=-\dimexpr\xister@X-#3\xister@Tv\relax
+          \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
+          \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
+        \else\ifxister@five@dot@
+          \pgfpathcircle
+            {\pgfpoint{\dimexpr\xister@X-#3\xister@five@dot\relax}%
+                      {\dimexpr\xister@Y-#2\xister@five@dot\relax}}%
+            {\xister@five@dot}%
+          \pgfusepath{fill}%
+        \else
+          \pgfsetlinewidth{2\xister@Th}%
+          \xister@TMPB=-\dimexpr\xister@Y-#2\xister@Th\relax
+          \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
+          \pgfpathlineto
+            {%
+              \pgfpoint
+                {-\dimexpr\xister@X-#3\xister@five@dash\xister@Th*2\relax}%
+                \xister@TMPB
+            }%
+        \fi\fi
       }%
     \xister@drawdigit{6#1}%
       {%
         \pgfsetlinewidth{2\xister@Th}%
-        \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@Y}%
-        \pgfpathlineto{\pgfpoint{-\dimexpr\xister@X/6\relax}\xister@Y}%
+        \xister@TMPB=\dimexpr\xister@Y-#2\xister@Th\relax
+        \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
+        \pgfpathlineto{\pgfpoint\xister@XY@share\xister@TMPB}%
       }%
     \xister@superimpose{7#1}%
       {%
@@ -942,21 +1151,14 @@ and the derived files           xistercian.pdf
         \copy\csname xister@digitbox@6#1\endcsname
       }%
   }
-\let\xister@drawdigits@v\xister@drawdigits@vertical
-\let\xister@drawdigits@h\xister@drawdigits@horizontal
-\let\xister@drawdigits\xister@drawdigits@v
 %    \end{macrocode}
 %   Each digit has the same bounding box and baseline which is specified here.
-%   |#1| will be the name, |#2| the digit specific path. We locally disable
-%   |\pgfsetcolor| to allow building colour-unsafe boxes. This only works as
-%   long as \pkg{luacolor} (or something equivalent) isn't used, so consider
-%   this a crude hack.
+%   |#1| will be the name, |#2| the digit specific path.
 %    \begin{macrocode}
 \newcommand\xister@drawdigit[2]
   {%
     \expandafter\setbox\csname xister@digitbox@#1\endcsname=\hbox
       {%
-        \let\pgfsetcolor\@gobble
         \begin{pgfpicture}%
           \pgfpathrectanglecorners
             {\pgfpoint{-\xister@bx\xister@X}{-\xister@by\xister@Y}}%
@@ -973,11 +1175,7 @@ and the derived files           xistercian.pdf
 %
 %
 % \begin{macro}[internal]
-%   {
-%     \xister@drawzero,
-%     \xister@drawzero@h,\xister@drawzero@horizontal,
-%     \xister@drawzero@v,\xister@drawzero@vertical,
-%   }
+%   {\xister@drawzero@horizontal,\xister@drawzero@vertical}
 %    \begin{macrocode}
 \newcommand*\xister@drawzero@vertical
   {%
@@ -997,9 +1195,6 @@ and the derived files           xistercian.pdf
         \pgfpathlineto{\pgfpoint\xister@X\z@}%
       }%
   }
-\let\xister@drawzero@v\xister@drawzero@vertical
-\let\xister@drawzero@h\xister@drawzero@horizontal
-\let\xister@drawzero\xister@drawzero@v
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1040,32 +1235,69 @@ and the derived files           xistercian.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\xister@build}
+% \begin{macro}[internal]
+%   {
+%     \xister@build,
+%     \xister@build@h,\xister@build@horizontal,
+%     \xister@build@v,\xister@build@vertical
+%   }
 %   First we set the length registers to the correct size, than we draw the
 %   glyphs batch wise. We have to flip the $x$-direction for the tenths and
 %   thousands, and the $y$-direction for the hundreds and thousands. The macro
-%   |\xister@sgn| is used to set the baseline in the correct direction.
+%   |\xister@sgn| is used to set the baseline in the correct direction. We
+%   locally disable |\pgfsetcolor| to allow building colour-unsafe boxes. This
+%   only works as long as \pkg{luacolor} (or something equivalent) isn't used,
+%   so consider this a crude hack.
 %    \begin{macrocode}
-\protected\def\xister@build
+\protected\def\xister@build@vertical
   {%
+    \let\xister@pgfsetcolor\pgfsetcolor
+    \let\pgfsetcolor\@gobble
     \xister@setlengths
     \def\xister@sgn{-}%
-    \xister@drawzero
-    \xister@drawdigits{}{}{}%
+    \xister@drawzero@vertical
+    \xister@drawdigits@vertical{}{}{}%
     \xister@X=-\xister@X
     \xister@Y=-\xister@Y
     \def\xister@sgn{+}%
-    \xister@drawdigits{000}{-}{-}%
+    \xister@drawdigits@vertical{000}{-}{-}%
     \xister@TMPA=\xister@Tdd
     \xister@Tdd=\xister@Tdu
     \xister@Tdu=\xister@TMPA
     \xister@X=-\xister@X
-    \xister@drawdigits{00}{-}{}%
+    \xister@drawdigits@vertical{00}{-}{}%
     \xister@X=-\xister@X
     \xister@Y=-\xister@Y
     \def\xister@sgn{-}%
-    \xister@drawdigits{0}{}{-}%
+    \xister@drawdigits@vertical{0}{}{-}%
+    \let\pgfsetcolor\xister@pgfsetcolor
   }
+\protected\def\xister@build@horizontal
+  {%
+    \let\xister@pgfsetcolor\pgfsetcolor
+    \let\pgfsetcolor\@gobble
+    \xister@setlengths
+    \def\xister@sgn{-}%
+    \xister@drawzero@horizontal
+    \xister@drawdigits@horizontal{}{}{}%
+    \xister@X=-\xister@X
+    \xister@Y=-\xister@Y
+    \def\xister@sgn{+}%
+    \xister@drawdigits@horizontal{000}{-}{-}%
+    \xister@TMPA=\xister@Tdd
+    \xister@Tdd=\xister@Tdu
+    \xister@Tdu=\xister@TMPA
+    \xister@X=-\xister@X
+    \xister@drawdigits@horizontal{0}{-}{}%
+    \xister@X=-\xister@X
+    \xister@Y=-\xister@Y
+    \def\xister@sgn{-}%
+    \xister@drawdigits@horizontal{00}{}{-}%
+    \let\pgfsetcolor\xister@pgfsetcolor
+  }
+\let\xister@build\xister@build@vertical
+\let\xister@build@v\xister@build@vertical
+\let\xister@build@h\xister@build@horizontal
 %    \end{macrocode}
 % \end{macro}
 %
