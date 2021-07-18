@@ -314,7 +314,11 @@ and the derived files           xistercian.pdf
 % \begin{figure}
 %   \centering
 %   \def\share{1/3}
-%   \expanded{\cisterciansetup{bx=1,by=1,fr=\share,ht=4cm,wd=2cm,sv=9pt,sh=5pt,sdd=9pt,sdu=5pt}}
+%   \expanded
+%     {^^A
+%       \cisterciansetup
+%         {bx=1,by=1,fr=\share,ht=4cm,wd=2cm,sv=9pt,sh=5pt,sdd=9pt,sdu=5pt}^^A
+%     }^^A
 %   \cistercianredraw
 %   \begin{tikzpicture}[>=Stealth,baseline=(base)]
 %     \node[color=green,inner sep=0] (sym) {\cisterciannum{9}};
@@ -324,13 +328,16 @@ and the derived files           xistercian.pdf
 %         \foreach\x in{{-1,0},{1,0},{0,-1},{0,1}} { (0,0) -- (\x) }
 %         ;
 %       \draw[dashed, line width=0.2pt] (0, \share) coordinate(fr) -- ++(1,0);
-%       \draw[<->] (1.2, 0) -- node[rotate=90,below]{\texttt{0.5*fr*ht}} (1.2,0 |- fr);
+%       \draw[<->]
+%         (1.2, 0) -- node[rotate=90,below]{\texttt{0.5*fr*ht}} (1.2,0 |- fr);
 %       \draw[<->] (-1, -1.1) -- node[below]{\texttt{wd}} ++(2,0);
 %       \draw[<->] (-1.2, -1) -- node[rotate=90,above]{\texttt{ht}} ++(0,2);
 %       \draw[red] (-1.6, -1.3) rectangle (1.6, 1.3);
 %       \draw[<->] (-1.6, -1.4) -- node[below]{\texttt{bx*wd}} (1.6, -1.4);
-%       \draw[<->] (1.8, -1.3) -- node[rotate=90,below]{\texttt{by*ht}} (1.8, 1.3);
-%       \draw[<->] (-1.8, 0) -- node[rotate=90,above]{\texttt{0.5*bs*ht}} (-1.8, -.75);
+%       \draw[<->]
+%         (1.8, -1.3) -- node[rotate=90,below]{\texttt{by*ht}} (1.8, 1.3);
+%       \draw[<->]
+%         (-1.8, 0) -- node[rotate=90,above]{\texttt{0.5*bs*ht}} (-1.8, -.75);
 %       \fill (-1.6, -0.75) circle[radius=2pt] coordinate(base);
 %     \end{scope}
 %   \end{tikzpicture}
@@ -348,15 +355,17 @@ and the derived files           xistercian.pdf
 %       \draw[<->] (-1.1, -1) -- node[rotate=90,above]{\texttt{ht}} ++(0,2);
 %       \draw[red] (-1.3, -1.6) rectangle (1.3, 1.6);
 %       \draw[<->] (-1.3, -1.8) -- node[below]{\texttt{bx*wd}} (1.3, -1.8);
-%       \draw[<->] (1.4, -1.6) -- node[rotate=90,below]{\texttt{by*ht}} (1.4, 1.6);
-%       \draw[<->] (-1.4, 0) -- node[rotate=90,above]{\texttt{0.5*bs*ht}} (-1.4, -.75);
+%       \draw[<->]
+%         (1.4, -1.6) -- node[rotate=90,below]{\texttt{by*ht}} (1.4, 1.6);
+%       \draw[<->]
+%         (-1.4, 0) -- node[rotate=90,above]{\texttt{0.5*bs*ht}} (-1.4, -.75);
 %       \fill (-1.3, -0.75) circle[radius=2pt] coordinate(base);
 %     \end{scope}
 %   \end{tikzpicture}
 %   \caption[Measurements of a glyph]
 %     {Measurements of a glyph. The red rectangle is the bounding box, the
-%     dot on the left shows the reference point of the resulting box placed on
-%     the surrounding baseline.\label{fig:size}}
+%     dot on the left shows the reference point placed on the surrounding
+%     baseline.\label{fig:size}}
 % \end{figure}
 %
 % \begin{function}{width,wd}
