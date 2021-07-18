@@ -510,12 +510,21 @@ and the derived files           xistercian.pdf
 %
 %   For |dash| you can specify the length of the dash in multiples of the used
 %   stroke thickness (which might differ for the horizontal and vertical
-%   symbols), an empty value is consider the same as $1$. The default is
+%   symbols), an empty value is considered the same as $1$. The default is
 %   \mbox{\mysdefault{\normalfont\emph{empty}}}.
 %
 %   A comparison of the three alternate forms is shown in
 %   figure~\ref{fig:fives}.
 % \end{function}
+% The usage might look like any of the following:
+% \begin{verbatim}
+% \cisterciansetup
+%   {
+%     5=triangle,
+%     5=dot,  5=dot=.1ex, 5={dot=.1ex},
+%     5=dash, 5=dash=2,   5={dash=2}
+%   }
+% \end{verbatim}
 %
 % \begin{figure}
 %   \centering
@@ -589,7 +598,8 @@ and the derived files           xistercian.pdf
 %   \end{syntax}
 %   Only usable as a package option. If this is used a bit of debugging
 %   information is printed in the log file and terminal, and some keys try to
-%   evaluate the given argument on the spot instead of lazily.
+%   evaluate the given argument on the spot instead of lazily. This might help
+%   to locate faulty input.
 % \end{function}
 %
 %
