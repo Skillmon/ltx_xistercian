@@ -1369,13 +1369,13 @@ and the derived files           xistercian.pdf
           \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
         \else\ifxister@five@dot@
           \pgfpathcircle
-            {\pgfpoint{\dimexpr\xister@X-#3\xister@five@dot\relax}%
+            {\pgfpoint{-\dimexpr\xister@X-#3\xister@five@dot\relax}%
                       {\dimexpr\xister@Y-#2\xister@five@dot\relax}}%
             {\xister@five@dot}%
           \pgfusepath{fill}%
         \else
           \pgfsetlinewidth{2\xister@Th}%
-          \xister@TMPB=-\dimexpr\xister@Y-#2\xister@Th\relax
+          \xister@TMPB=\dimexpr\xister@Y-#2\xister@Th\relax
           \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
           \pgfpathlineto
             {%
