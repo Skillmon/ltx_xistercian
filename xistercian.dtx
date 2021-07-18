@@ -131,7 +131,7 @@ and the derived files           xistercian.pdf
     \noalign{\vskip1ex}
   }
 \AddToHook{bfseries}
-  {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.5em}}
+  {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.625em}}
 \AddToHook{mdseries}{\myrestoredefaults}
 \cisterciansetup{redraw+=series}
 \ExplSyntaxOff
@@ -290,7 +290,7 @@ and the derived files           xistercian.pdf
 % \end{function}
 % For example, the key |horizontal| is equivalently defined to
 % \begin{verbatim}
-% \cistercianstyle{horizontal}{o=h,wd=0.62em,ht=1ex}
+% \cistercianstyle{horizontal}{o=h,wd=0.775em,ht=1.13ex}
 % \end{verbatim}
 %
 %
@@ -483,14 +483,15 @@ and the derived files           xistercian.pdf
 %   \begin{syntax}
 %     horizontal
 %   \end{syntax}
-%   Same as setting |orientation = horizontal, width = 0.62em, height = 1ex|.
+%   Same as setting
+%   |orientation = horizontal, width = 0.775em, height = 1.13ex|.
 % \end{function}
 %
 % \begin{function}{vertical}
 %   \begin{syntax}
 %     vertical
 %   \end{syntax}
-%   Same as setting |orientation = vertical, width = 0.4em, height = 1.55ex|.
+%   Same as setting |orientation = vertical, width = 0.5em, height = 1.55ex|.
 % \end{function}
 %
 % \begin{function}{alternate-5,5}
@@ -612,12 +613,12 @@ and the derived files           xistercian.pdf
 % \begin{verbatim}
 % \AddToHook{bfseries}
 %   {%
-%     \cisterciansetup{sv=.27ex,sdd=.27ex,sh=.15ex,sdu=.15ex,wd=.5em}%
+%     \cisterciansetup{sv=.27ex,sdd=.27ex,sh=.15ex,sdu=.15ex,wd=.625em}%
 %     \cistercianredrawlazy
 %   }
 % \AddToHook{mdseries}
 %   {%
-%     \cisterciansetup{sv=.18ex,sdd=.18ex,sh=.1ex,sdu=.1ex,wd=.4em}%
+%     \cisterciansetup{sv=.18ex,sdd=.18ex,sh=.1ex,sdu=.1ex,wd=.5em}%
 %     \cistercianredrawlazy
 %   }
 % This results in \cisterciannum{2} different \enquote{series}.\par
@@ -636,9 +637,9 @@ and the derived files           xistercian.pdf
 % determine when to redraw:
 % \begin{verbatim}
 % \AddToHook{bfseries}
-%   {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.15ex,sdu=.15ex,wd=.5em}}
+%   {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.15ex,sdu=.15ex,wd=.625em}}
 % \AddToHook{mdseries}
-%   {\cisterciansetup{sv=.18ex,sdd=.18ex,sh=.1ex,sdu=.1ex,wd=.4em}}
+%   {\cisterciansetup{sv=.18ex,sdd=.18ex,sh=.1ex,sdu=.1ex,wd=.5em}}
 % \cisterciansetup{redraw+=series}
 % \end{verbatim}
 %
@@ -663,7 +664,7 @@ and the derived files           xistercian.pdf
 \newcommand*\xister@tv{.18ex}
 \newcommand*\xister@tdu{.1ex}
 \newcommand*\xister@tdd{.18ex}
-\newcommand*\xister@x{.4em}
+\newcommand*\xister@x{.5em}
 \newcommand*\xister@y{1.55ex}
 \newcommand*\xister@bx{1.2}
 \newcommand*\xister@by{}
@@ -961,13 +962,13 @@ and the derived files           xistercian.pdf
 \protected\ekvdefNoVal{xister}{horizontal}
   {%
     \let\xister@build\xister@build@horizontal
-    \def\xister@x{.62em}%
-    \def\xister@y{1ex}%
+    \def\xister@x{.775em}%
+    \def\xister@y{1.13ex}%
   }
 \protected\ekvdefNoVal{xister}{vertical}
   {%
     \let\xister@build\xister@build@vertical
-    \def\xister@x{.4em}%
+    \def\xister@x{.5em}%
     \def\xister@y{1.55ex}%
   }
 %    \end{macrocode}
