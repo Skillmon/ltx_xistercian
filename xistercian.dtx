@@ -60,6 +60,8 @@ and the derived files           xistercian.pdf
 \documentclass{l3doc}
 \RequirePackage[fulloldstyle,nott]{kpfonts}
 \RequirePackage{csquotes}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta}
 \RequirePackage{randtext}
 \input{glyphtounicode}
 \pdfgentounicode=1
@@ -208,6 +210,10 @@ and the derived files           xistercian.pdf
 % \begin{verbatim}
 % \pagenumbering{cistercian}
 % \end{verbatim}
+% or to use them as footnotes:
+% \begin{verbatim}
+% \renewcommand\thefootnote{\cistercian{footnotes}}
+% \end{verbatim}
 %
 % The package tries to play nice on \pkg{hyperref} if it is loaded, but
 % bookmarks containing material that should've been a Cistercian numeral will
@@ -216,8 +222,8 @@ and the derived files           xistercian.pdf
 %
 % Negative numbers just keep a leading~|-|, and numbers with an absolute number
 % greater than $9999$ are displayed with multiple Cistercian digits. For
-% instance $-12345678$ is displayed as \cistexnum{-12345678}. And in the seldom
-% case that four consecutive digits are zeros they get displayed as that:
+% instance $-12345678$ is displayed as \cistexnum{-12345678}. And in the case
+% that four consecutive digits are zeros they get displayed as that:
 % \cistexnum{10000} is $10000$.
 %
 %
@@ -302,7 +308,56 @@ and the derived files           xistercian.pdf
 % according to the |redraw| option's feature list (by default only when the size
 % changed) since the last time they were drawn.
 %
-% Initial values if present are printed on the right.
+% Initial values if present are printed on the right. A small graphic explaining
+% most of the size related options is shown in figure~\ref{fig:size}.
+%
+% \begin{figure}
+%   \centering
+%   \def\share{1/3}
+%   \expanded{\cisterciansetup{bx=1,by=1,fr=\share,ht=4cm,wd=2cm,sv=9pt,sh=5pt,sdd=9pt,sdu=5pt}}
+%   \cistercianredraw
+%   \begin{tikzpicture}[>=Stealth,baseline=(base)]
+%     \node[color=green,inner sep=0] (sym) {\cisterciannum{9}};
+%     \begin{scope}[y=(sym.north),x=(sym.east)]
+%       \draw (-1,-1) rectangle (1,1);
+%       \draw[dashed, line width=0.2pt]
+%         \foreach\x in{{-1,0},{1,0},{0,-1},{0,1}} { (0,0) -- (\x) }
+%         ;
+%       \draw[dashed, line width=0.2pt] (0, \share) coordinate(fr) -- ++(1,0);
+%       \draw[<->] (1.2, 0) -- node[rotate=90,below]{\texttt{0.5*fr*ht}} (1.2,0 |- fr);
+%       \draw[<->] (-1, -1.1) -- node[below]{\texttt{wd}} ++(2,0);
+%       \draw[<->] (-1.2, -1) -- node[rotate=90,above]{\texttt{ht}} ++(0,2);
+%       \draw[red] (-1.6, -1.3) rectangle (1.6, 1.3);
+%       \draw[<->] (-1.6, -1.4) -- node[below]{\texttt{bx*wd}} (1.6, -1.4);
+%       \draw[<->] (1.8, -1.3) -- node[rotate=90,below]{\texttt{by*ht}} (1.8, 1.3);
+%       \draw[<->] (-1.8, 0) -- node[rotate=90,above]{\texttt{0.5*bs*ht}} (-1.8, -.75);
+%       \fill (-1.6, -0.75) circle[radius=2pt] coordinate(base);
+%     \end{scope}
+%   \end{tikzpicture}
+%   \cisterciansetup{o=h,ht=2cm,wd=4cm}\cistercianredraw
+%   \begin{tikzpicture}[>=Stealth,baseline=(base)]
+%     \node[color=green,inner sep=0] (sym) {\cisterciannum{9}};
+%     \begin{scope}[y=(sym.north),x=(sym.east)]
+%       \draw (-1,-1) rectangle (1,1);
+%       \draw[dashed, line width=0.2pt]
+%         \foreach\x in{{-1,0},{1,0},{0,-1},{0,1}} { (0,0) -- (\x) }
+%         ;
+%       \draw[dashed, line width=0.2pt] (-\share,0) coordinate(fr) -- ++(0,1);
+%       \draw[<->] (0, 1.2) -- node[above]{\texttt{0.5*fr*wd}} (0,1.2 -| fr);
+%       \draw[<->] (-1, -1.2) -- node[below]{\texttt{wd}} ++(2,0);
+%       \draw[<->] (-1.1, -1) -- node[rotate=90,above]{\texttt{ht}} ++(0,2);
+%       \draw[red] (-1.3, -1.6) rectangle (1.3, 1.6);
+%       \draw[<->] (-1.3, -1.8) -- node[below]{\texttt{bx*wd}} (1.3, -1.8);
+%       \draw[<->] (1.4, -1.6) -- node[rotate=90,below]{\texttt{by*ht}} (1.4, 1.6);
+%       \draw[<->] (-1.4, 0) -- node[rotate=90,above]{\texttt{0.5*bs*ht}} (-1.4, -.75);
+%       \fill (-1.3, -0.75) circle[radius=2pt] coordinate(base);
+%     \end{scope}
+%   \end{tikzpicture}
+%   \caption[Measurements of a glyph]
+%     {Measurements of a glyph. The red rectangle is the bounding box, the
+%     dot on the left shows the reference point of the resulting box placed on
+%     the surrounding baseline.\label{fig:size}}
+% \end{figure}
 %
 % \begin{function}{width,wd}
 %   \begin{syntax}
@@ -632,6 +687,7 @@ and the derived files           xistercian.pdf
 %   things.
 %    \begin{macrocode}
 \let\xister@dbg@dim\@gobble
+\let\xister@dbg@div\@gobble
 \let\xister@dbg@float\@gobble
 %    \end{macrocode}
 % \end{macro}
@@ -639,7 +695,98 @@ and the derived files           xistercian.pdf
 %
 % \subsection{Options}
 %
-% We define the keys
+% Some macros are required to parse options.
+%
+% \begin{macro}[internal]{\xister@if@slash}
+%   We need to test whether a slash is inside an argument to parse some user
+%   option. Since this isn't needed inside an inner loop we don't create an
+%   optimised version and only borrow a generic \pkg{expl3} function.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\cs_new_protected:Npn \xister@if@slash #1 { \tl_if_in:nnTF {#1} { / } }
+\ExplSyntaxOff
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\xister@fraction}
+%    \begin{macrocode}
+\protected\long\def\xister@fraction#1/#2\xister@stop
+  {%
+    \edef\xister@share@mul{\unexpanded{#1}}%
+    \xister@dbg@float{#1}%
+    \edef\xister@share@div{/\unexpanded{#2}}%
+    \xister@dbg@div{#2}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {
+%     \xister@build,
+%     \xister@build@h,\xister@build@horizontal,
+%     \xister@build@v,\xister@build@vertical
+%   }
+%   First we set the length registers to the correct size, than we draw the
+%   glyphs batch wise. We have to flip the $x$-direction for the tenths and
+%   thousands, and the $y$-direction for the hundreds and thousands. The macro
+%   |\xister@sgn| is used to set the baseline in the correct direction. We
+%   locally disable |\pgfsetcolor| to allow building colour-unsafe boxes. This
+%   only works as long as \pkg{luacolor} (or something equivalent) isn't used,
+%   so consider this a crude hack.
+%    \begin{macrocode}
+\protected\def\xister@build@vertical
+  {%
+    \let\xister@pgfsetcolor\pgfsetcolor
+    \let\pgfsetcolor\@gobble
+    \xister@setlengths
+    \def\xister@sgn{-}%
+    \xister@drawzero@vertical
+    \xister@drawdigits@vertical{}{}{}%
+    \xister@X=-\xister@X
+    \xister@Y=-\xister@Y
+    \def\xister@sgn{+}%
+    \xister@drawdigits@vertical{000}{-}{-}%
+    \xister@TMPA=\xister@Tdd
+    \xister@Tdd=\xister@Tdu
+    \xister@Tdu=\xister@TMPA
+    \xister@X=-\xister@X
+    \xister@drawdigits@vertical{00}{-}{}%
+    \xister@X=-\xister@X
+    \xister@Y=-\xister@Y
+    \def\xister@sgn{-}%
+    \xister@drawdigits@vertical{0}{}{-}%
+    \let\pgfsetcolor\xister@pgfsetcolor
+  }
+\protected\def\xister@build@horizontal
+  {%
+    \let\xister@pgfsetcolor\pgfsetcolor
+    \let\pgfsetcolor\@gobble
+    \xister@setlengths
+    \def\xister@sgn{-}%
+    \xister@drawzero@horizontal
+    \xister@drawdigits@horizontal{}{}{}%
+    \xister@X=-\xister@X
+    \xister@Y=-\xister@Y
+    \def\xister@sgn{+}%
+    \xister@drawdigits@horizontal{000}{-}{-}%
+    \xister@TMPA=\xister@Tdd
+    \xister@Tdd=\xister@Tdu
+    \xister@Tdu=\xister@TMPA
+    \xister@X=-\xister@X
+    \xister@drawdigits@horizontal{0}{-}{}%
+    \xister@X=-\xister@X
+    \xister@Y=-\xister@Y
+    \def\xister@sgn{-}%
+    \xister@drawdigits@horizontal{00}{}{-}%
+    \let\pgfsetcolor\xister@pgfsetcolor
+  }
+\let\xister@build\xister@build@vertical
+\let\xister@build@v\xister@build@vertical
+\let\xister@build@h\xister@build@horizontal
+%    \end{macrocode}
+% \end{macro}
+%
+% Now we define the keys
 %    \begin{macrocode}
 \ekvifdefinedset{xister}
   {\PackageError{xistercian}{keyval conflict detected. Aborting}{}\endinput}{}
@@ -759,6 +906,13 @@ and the derived files           xistercian.pdf
         \typeout
           {Package xistercian Debug: Trying to use float `\unexpanded{##1}'.}%
         \xister@TMPA=##1\z@
+        \typeout{Package xistercian Debug: Done.}%
+      }%
+    \protected\long\def\xister@dbg@div##1%
+      {%
+        \typeout
+          {Package xistercian Debug: Trying to use divisor `\unexpanded{##1}'.}%
+        \xister@TMPA=\dimexpr\z@/##1\relax
         \typeout{Package xistercian Debug: Done.}%
       }%
   }
@@ -888,27 +1042,6 @@ and the derived files           xistercian.pdf
     \ifdefined\texorpdfstring
       \let\xister@texorpdf\texorpdfstring
     \fi
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[internal]{\xister@if@slash}
-%   We need to test whether a slash is inside an argument to parse some user
-%   option. Since this isn't needed inside an inner loop we don't create an
-%   optimised version and only borrow a generic \pkg{expl3} function.
-%    \begin{macrocode}
-\ExplSyntaxOn
-\cs_new_protected:Npn \xister@if@slash #1 { \tl_if_in:nnTF {#1} { / } }
-\ExplSyntaxOff
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[internal]{\xister@fraction}
-%    \begin{macrocode}
-\protected\long\def\xister@fraction#1/#2\xister@stop
-  {%
-    \edef\xister@share@mul{\unexpanded{#1}}%
-    \edef\xister@share@div{/\unexpanded{#2}}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1115,7 +1248,7 @@ and the derived files           xistercian.pdf
     \xister@drawdigit{2#1}%
       {%
         \pgfsetlinewidth{2\xister@Tv}%
-        \xister@TMPA=-\dimexpr#3\xister@Th-\xister@XY@share\relax
+        \xister@TMPA=-\dimexpr#3\xister@Tv-\xister@XY@share\relax
         \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
         \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
       }%
@@ -1274,72 +1407,6 @@ and the derived files           xistercian.pdf
         }%
     \xister@tmp
   }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[internal]
-%   {
-%     \xister@build,
-%     \xister@build@h,\xister@build@horizontal,
-%     \xister@build@v,\xister@build@vertical
-%   }
-%   First we set the length registers to the correct size, than we draw the
-%   glyphs batch wise. We have to flip the $x$-direction for the tenths and
-%   thousands, and the $y$-direction for the hundreds and thousands. The macro
-%   |\xister@sgn| is used to set the baseline in the correct direction. We
-%   locally disable |\pgfsetcolor| to allow building colour-unsafe boxes. This
-%   only works as long as \pkg{luacolor} (or something equivalent) isn't used,
-%   so consider this a crude hack.
-%    \begin{macrocode}
-\protected\def\xister@build@vertical
-  {%
-    \let\xister@pgfsetcolor\pgfsetcolor
-    \let\pgfsetcolor\@gobble
-    \xister@setlengths
-    \def\xister@sgn{-}%
-    \xister@drawzero@vertical
-    \xister@drawdigits@vertical{}{}{}%
-    \xister@X=-\xister@X
-    \xister@Y=-\xister@Y
-    \def\xister@sgn{+}%
-    \xister@drawdigits@vertical{000}{-}{-}%
-    \xister@TMPA=\xister@Tdd
-    \xister@Tdd=\xister@Tdu
-    \xister@Tdu=\xister@TMPA
-    \xister@X=-\xister@X
-    \xister@drawdigits@vertical{00}{-}{}%
-    \xister@X=-\xister@X
-    \xister@Y=-\xister@Y
-    \def\xister@sgn{-}%
-    \xister@drawdigits@vertical{0}{}{-}%
-    \let\pgfsetcolor\xister@pgfsetcolor
-  }
-\protected\def\xister@build@horizontal
-  {%
-    \let\xister@pgfsetcolor\pgfsetcolor
-    \let\pgfsetcolor\@gobble
-    \xister@setlengths
-    \def\xister@sgn{-}%
-    \xister@drawzero@horizontal
-    \xister@drawdigits@horizontal{}{}{}%
-    \xister@X=-\xister@X
-    \xister@Y=-\xister@Y
-    \def\xister@sgn{+}%
-    \xister@drawdigits@horizontal{000}{-}{-}%
-    \xister@TMPA=\xister@Tdd
-    \xister@Tdd=\xister@Tdu
-    \xister@Tdu=\xister@TMPA
-    \xister@X=-\xister@X
-    \xister@drawdigits@horizontal{0}{-}{}%
-    \xister@X=-\xister@X
-    \xister@Y=-\xister@Y
-    \def\xister@sgn{-}%
-    \xister@drawdigits@horizontal{00}{}{-}%
-    \let\pgfsetcolor\xister@pgfsetcolor
-  }
-\let\xister@build\xister@build@vertical
-\let\xister@build@v\xister@build@vertical
-\let\xister@build@h\xister@build@horizontal
 %    \end{macrocode}
 % \end{macro}
 %
