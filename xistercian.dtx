@@ -570,7 +570,8 @@ and the derived files           xistercian.pdf
 %   to the existing features, else they overwrite any existing configuration.
 %
 %   Without a value the key will issue |\cistercianredrawlazy|, and if you use
-%   the |!|~variant it'll use |\cistercianredraw|.
+%   the |!|~variant it'll use |\cistercianredraw|. This usage is only available
+%   after the package was loaded.
 % \end{function}
 %
 % \begin{function}{debug}
@@ -786,6 +787,75 @@ and the derived files           xistercian.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\xister@fontfeatures,\xister@add@fontfeature}
+%   This macro should store the different font features which should be kept
+%   track of. It will be redefined programmatically but the default is quite
+%   easy, just track the font size.
+%    \begin{macrocode}
+\protected\long\def\xister@add@fontfeature#1%
+  {%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx
+        \csname xister@add@fontfeature@\detokenize{#1}\endcsname
+        \relax
+      \PackageError{xistercian}{Unsupported font feature `\detokenize{#1}'.}{}%
+    \else
+      \csname xister@add@fontfeature@\detokenize{#1}\endcsname
+    \fi
+  }
+\def\xister@fontfeatures{\unexpanded\expandafter{\f@size}/}
+%    \end{macrocode}
+%   We know that the colour hack breaks if \pkg{luacolor} is loaded, so if that
+%   is found to be the case we add the |color| feature to the list of things we
+%   need to track. But we only want to add it if it's not yet in the list, so we
+%   run a check we borrow from \pkg{expl3}.
+%    \begin{macrocode}
+\ExplSyntaxOn
+\AddToHook{begindocument/before}
+  {
+    \@ifpackageloaded { luacolor }
+      {
+        \exp_args:No \str_if_in:nnF \xister@fontfeatures { color }
+          { \xister@add@fontfeature{color} }
+      }
+      {}
+  }
+\ExplSyntaxOff
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {
+%     \xister@add@fontfeature@encoding,
+%     \xister@add@fontfeature@family,
+%     \xister@add@fontfeature@series,
+%     \xister@add@fontfeature@shape,
+%     \xister@add@fontfeature@size,
+%   }
+%   These macros all just add a specific macro to the list of things contained
+%   in |\xister@fontfeatures|, which determines what to consider deciding to
+%   redraw.
+%    \begin{macrocode}
+\def\xister@tmp#1#2%
+  {%
+    \protected\expandafter\def\csname xister@add@fontfeature@#2\endcsname
+      {%
+        \edef\xister@fontfeatures
+          {%
+            \unexpanded\expandafter
+              {\xister@fontfeatures\unexpanded\expandafter{#1}}/%
+          }%
+      }%
+  }
+\expandafter\xister@tmp\csname\string\color@.\endcsname{color}
+\xister@tmp\f@encoding{encoding}
+\xister@tmp\f@family  {family}
+\xister@tmp\f@series  {series}
+\xister@tmp\f@shape   {shape}
+\xister@tmp\f@size    {size}
+%    \end{macrocode}
+% \end{macro}
+%
 % Now we define the keys
 %    \begin{macrocode}
 \ekvifdefinedset{xister}
@@ -869,10 +939,6 @@ and the derived files           xistercian.pdf
 \ekvlet{xister}{5}\xister@five@set
 \ekvlet{xister}{alternate-5}\xister@five@set
 \let\xister@five@set\xister@undefined
-\protected\ekvdefNoVal{xister}{r!}{\cistercianredraw}
-\protected\ekvdefNoVal{xister}{r} {\cistercianredrawlazy}
-\ekvletkvNoVal{xister}{redraw} {xister}{r}
-\ekvletkvNoVal{xister}{redraw!}{xister}{r!}
 \protected\ekvdefNoVal{xister}{horizontal}
   {%
     \let\xister@build\xister@build@horizontal
@@ -921,6 +987,14 @@ and the derived files           xistercian.pdf
 % |debug| are quite frequent we don't look at the global options).
 %    \begin{macrocode}
 \ekvoProcessLocalOptions{xister}
+%    \end{macrocode}
+%
+% After the package was loaded we add the two |redraw| variants without a value.
+%    \begin{macrocode}
+\protected\ekvdefNoVal{xister}{r!}{\cistercianredraw}
+\protected\ekvdefNoVal{xister}{r} {\cistercianredrawlazy}
+\ekvletkvNoVal{xister}{redraw} {xister}{r}
+\ekvletkvNoVal{xister}{redraw!}{xister}{r!}
 %    \end{macrocode}
 %
 % The |debug| option is only available as a package option, we let it throw an
@@ -1446,75 +1520,6 @@ and the derived files           xistercian.pdf
     \unexpanded{\fi}%
   }
 \AtBeginDocument{\xister@ensure@current}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[internal]{\xister@fontfeatures,\xister@add@fontfeature}
-%   This macro should store the different font features which should be kept
-%   track of. It will be redefined programmatically but the default is quite
-%   easy, just track the font size.
-%    \begin{macrocode}
-\protected\long\def\xister@add@fontfeature#1%
-  {%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx
-        \csname xister@add@fontfeature@\detokenize{#1}\endcsname
-        \relax
-      \PackageError{xistercian}{Unsupported font feature `\detokenize{#1}'.}{}%
-    \else
-      \csname xister@add@fontfeature@\detokenize{#1}\endcsname
-    \fi
-  }
-\def\xister@fontfeatures{\unexpanded\expandafter{\f@size}/}
-%    \end{macrocode}
-%   We know that the colour hack breaks if \pkg{luacolor} is loaded, so if that
-%   is found to be the case we add the |color| feature to the list of things we
-%   need to track. But we only want to add it if it's not yet in the list, so we
-%   run a check we borrow from \pkg{expl3}.
-%    \begin{macrocode}
-\ExplSyntaxOn
-\AddToHook{begindocument/before}
-  {
-    \@ifpackageloaded { luacolor }
-      {
-        \exp_args:No \str_if_in:nnF \xister@fontfeatures { color }
-          { \xister@add@fontfeature{color} }
-      }
-      {}
-  }
-\ExplSyntaxOn
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[internal]
-%   {
-%     \xister@add@fontfeature@encoding,
-%     \xister@add@fontfeature@family,
-%     \xister@add@fontfeature@series,
-%     \xister@add@fontfeature@shape,
-%     \xister@add@fontfeature@size,
-%   }
-%   These macros all just add a specific macro to the list of things contained
-%   in |\xister@fontfeatures|, which determines what to consider deciding to
-%   redraw.
-%    \begin{macrocode}
-\def\xister@tmp#1#2%
-  {%
-    \protected\expandafter\def\csname xister@add@fontfeature@#2\endcsname
-      {%
-        \edef\xister@fontfeatures
-          {%
-            \unexpanded\expandafter
-              {\xister@fontfeatures\unexpanded\expandafter{#1}}/%
-          }%
-      }%
-  }
-\expandafter\xister@tmp\csname\string\color@.\endcsname{color}
-\xister@tmp\f@encoding{encoding}
-\xister@tmp\f@family  {family}
-\xister@tmp\f@series  {series}
-\xister@tmp\f@shape   {shape}
-\xister@tmp\f@size    {size}
 %    \end{macrocode}
 % \end{macro}
 %
