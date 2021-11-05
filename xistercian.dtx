@@ -1118,13 +1118,13 @@ and the derived files           xistercian.pdf
 \AddToHook{package/after/hyperref}
   {%
     \ifdefined\texorpdfstring
-      \let\xister@texorpdf\texorpdfstring
+      \def\xister@texorpdf{\texorpdfstring}%
     \fi
   }
 \AddToHook{begindocument/before}
   {%
     \ifdefined\texorpdfstring
-      \let\xister@texorpdf\texorpdfstring
+      \def\xister@texorpdf{\texorpdfstring}%
     \fi
   }
 %    \end{macrocode}
