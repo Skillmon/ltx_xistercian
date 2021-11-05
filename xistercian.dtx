@@ -245,9 +245,8 @@ and the derived files           xistercian.pdf
 %   \end{syntax}
 %   Prints the \meta{integer} as a Cistercian numeral. The \meta{integer} has to
 %   be provided as a string containing only digits and optionally a single
-%   leading~|-| (spaces are ignored). This can handle integers of almost
-%   arbitrary size (well, an integer with more than $2147483647$ places will be
-%   an issue).
+%   leading~|-| (spaces are ignored). This can handle integers of arbitrary
+%   size.
 % \end{function}
 %
 % \begin{function}{\cisterciannumE}
@@ -1109,16 +1108,7 @@ and the derived files           xistercian.pdf
 \def\xister@gobbletoat#1@{}
 \def\xister@gobbletozero#10{}
 \def\xister@gobblecopy0\rlap#1{}
-\def\xister@done#1\xister@symbols@{}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}[internal]{\xister@count,\xister@count@done}
-%   A simple loop to count tokens. The loop delimiter is a single |@|. Should be
-%   used after |\numexpr|.
-%    \begin{macrocode}
-\def\xister@count#1{\xister@gobbletoat#1\xister@count@done @+1\xister@count}
-\def\xister@count@done @+1\xister@count{\relax @}
+\def\xister@done#1\xister@symbols{}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1143,7 +1133,7 @@ and the derived files           xistercian.pdf
 %
 % \subsubsection{Input Parsing}
 %
-% \begin{macro}[internal]{\xister@a,\xister@b,\xister@c}
+% \begin{macro}[internal]{\xister@a,\xister@b,\xister@c,\xister@d}
 %   First we have to make sure that we're in horizontal mode, else the |\rlap|s
 %   used to insert the glyphs will create havoc. We also need to ensure that the
 %   boxes contain the correct glyphs according to the current size and colour.
@@ -1158,29 +1148,44 @@ and the derived files           xistercian.pdf
     \else\expandafter\xister@b\expandafter#1\fi
   }
 %    \end{macrocode}
-%   Next we count the number of decimal digits in the number we want to print,
-%   take that modulo $4$ (that's what's |4*((#1-2)/4)| is doing, thanks to Heiko
-%   Oberdiek and the code in \pkg{expl3}), and use the correct symbol creating
-%   macro. The |@@@@| serves as the end marker since each step (except the
-%   first) will grab four digits.
+%   Next we check whether the remaining number is empty. If that is the case we
+%   use |\the\numexpr\relax| to throw a missing number error and produce just a
+%   zero stem. Else we do a dry run over the input number to see how many
+%   leading zeros we must pad to get blocks of four. The two blocks of |@@@@|
+%   serve as end markers since each step of both \cs{xister@c} and
+%   \cs{xister@symbols} will grab four digits.
 %    \begin{macrocode}
 \def\xister@b#1@%
-  {\expandafter\xister@c\the\numexpr\xister@count#1@#1@@@@}
-\def\xister@c#1@%
-  {\csname xister@symbols@\romannumeral\numexpr#1-4*((#1-2)/4)\relax\endcsname}
+  {%
+    \if\relax\detokenize{#1}\relax
+      \expandafter\xister@gobbletozero\the\numexpr\relax
+      \xister@symbols0000@@@@%
+      \expandafter\@gobbletwo
+    \fi
+    \@firstofone{\xister@c#1@@@@\relax#1@@@@}%
+  }
+\def\xister@c#1#2#3#4%
+  {%
+    \xister@gobbletoat
+      #1\xister@d{}%
+      #2\xister@d{000}%
+      #3\xister@d{00}%
+      #4\xister@d0%
+      @\xister@c
+  }
+\def\xister@d#1#2@\xister@c#3\relax{\xister@symbols#1}
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]
-%   {\xister@symbols@,\xister@symbols@i,\xister@symbols@ii,\xister@symbols@iii}
+% \begin{macro}[internal]{\xister@symbols}
 %   When this loop is done all arguments will be |@|, but we only check the
 %   first here. We generate the symbols by overlaying up to five boxes, one for
 %   each decade plus the zero stem. Each digit might be skipped if it is $0$.
 %   Next grab the next four digits.
 %    \begin{macrocode}
-\def\xister@symbols@#1%
+\def\xister@symbols#1%
   {%
-    \protected\def\xister@symbols@##1##2##3##4%
+    \protected\def\xister@symbols##1##2##3##4%
       {%
         \xister@gobbletoat##1\xister@done @%
         \xister@gobbletozero##1\xister@gobblecopy0%
@@ -1192,17 +1197,10 @@ and the derived files           xistercian.pdf
         \xister@gobbletozero##4\xister@gobblecopy0%
           \rlap{\copy\csname xister@digitbox@##4\endcsname}%
         \copy#1%
-        \xister@symbols@
+        \xister@symbols
       }%
   }
-\expandafter\xister@symbols@\csname xister@digitbox@0\endcsname
-%    \end{macrocode}
-%   If there are less than four decimal digits inside the first Cistercian
-%   numeral we provide enough zeros to fill up the remainder.
-%    \begin{macrocode}
-\def\xister@symbols@i{\xister@symbols@000}
-\def\xister@symbols@ii{\xister@symbols@00}
-\def\xister@symbols@iii{\xister@symbols@0}
+\expandafter\xister@symbols\csname xister@digitbox@0\endcsname
 %    \end{macrocode}
 % \end{macro}
 %
