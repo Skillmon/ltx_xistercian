@@ -1,7 +1,7 @@
 -- Build script for xistercian
 module     = "xistercian"
 pkgversion = "1.1"
-pkgdate    = "2021-11-05"
+pkgdate    = "2021-11-23"
 
 -- update package date and version
 tagfiles = {"xistercian.dtx", "README.md", "CTAN.md"}
