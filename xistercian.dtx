@@ -55,10 +55,11 @@ and the derived files           xistercian.pdf
 \fi
 %
 \IfFileExists{xistercian.sty}{\RequirePackage[debug]{xistercian}}{}
-\ProvidesFile{xistercian.dtx}[2021-11-23 v1.1 Cistercian numerals in LaTeX]
+\ProvidesFile{xistercian.dtx}[2021-11-23 v1.1a Cistercian numerals in LaTeX]
 \PassOptionsToPackage{full}{textcomp}
 \documentclass{l3doc}
 \RequirePackage[fulloldstyle,nott]{kpfonts}
+\RequirePackage{microtype}
 \RequirePackage{csquotes}
 \RequirePackage{tikz}
 \usetikzlibrary{arrows.meta}
@@ -138,7 +139,7 @@ and the derived files           xistercian.pdf
 \begin{document}
   \title{The \pkg{xistercian} package}
   \author{Jonathan P. Spratte\thanks{\protect\randomize{jspratte@yahoo.de}}}
-  \date{2021-11-23 v1.1}
+  \date{2021-11-23 v1.1a}
   \DocInput{xistercian.dtx}
 \end{document}
 %</driver>^^A=<<
@@ -520,9 +521,9 @@ and the derived files           xistercian.pdf
 % \begin{verbatim}
 % \cisterciansetup
 %   {
-%     5=triangle,
-%     5=dot,  5=dot=.1ex, 5={dot=.1ex},
-%     5=dash, 5=dash=2,   5={dash=2}
+%     5=triangle, 5={triangle},
+%     5=dot,  5={dot},  5=dot=.1ex, 5={dot=.1ex},
+%     5=dash, 5={dash}, 5=dash=2,   5={dash=2}
 %   }
 % \end{verbatim}
 %
@@ -646,10 +647,11 @@ and the derived files           xistercian.pdf
 % \clearpage
 % \section{Implementation}
 %
-% First we load the required packages
+% First we say who we are and load the required packages
 % \gobbledocstriptag
 %<*pkg>
 %    \begin{macrocode}
+\ProvidesPackage{xistercian}[2021-11-23 v1.1a Cistercian numerals in LaTeX]
 \RequirePackage{pgf,expkv-opt}
 %    \end{macrocode}
 %
@@ -1151,9 +1153,11 @@ and the derived files           xistercian.pdf
 %   Next we check whether the remaining number is empty. If that is the case we
 %   use |\the\numexpr\relax| to throw a missing number error and produce just a
 %   zero stem. Else we do a dry run over the input number to see how many
-%   leading zeros we must pad to get blocks of four. The two blocks of |@@@@|
-%   serve as end markers since each step of both \cs{xister@c} and
-%   \cs{xister@symbols} will grab four digits.
+%   leading zeros we must pad to get blocks of four. The two blocks of |@|s
+%   serve as end markers since each step of both \cs{xister@c} grabs eight and
+%   each of \cs{xister@symbols} will grab four digits. The \cs{xister@c} is
+%   used to put enough zeros in front of our number such that it consists of
+%   blocks of four digits.
 %    \begin{macrocode}
 \def\xister@b#1@%
   {%
@@ -1162,15 +1166,19 @@ and the derived files           xistercian.pdf
       \xister@symbols0000@@@@%
       \expandafter\@gobbletwo
     \fi
-    \@firstofone{\xister@c#1@@@@\relax#1@@@@}%
+    \@firstofone{\xister@c#1@@@@@@@@\relax#1@@@@}%
   }
-\def\xister@c#1#2#3#4%
+\def\xister@c#1#2#3#4#5#6#7#8%
   {%
     \xister@gobbletoat
       #1\xister@d{}%
       #2\xister@d{000}%
       #3\xister@d{00}%
       #4\xister@d0%
+      #5\xister@d{}%
+      #6\xister@d{000}%
+      #7\xister@d{00}%
+      #8\xister@d0%
       @\xister@c
   }
 \def\xister@d#1#2@\xister@c#3\relax{\xister@symbols#1}

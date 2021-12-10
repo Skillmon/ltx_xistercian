@@ -1,6 +1,6 @@
 -- Build script for xistercian
 module     = "xistercian"
-pkgversion = "1.1"
+pkgversion = "1.1a"
 pkgdate    = "2021-11-23"
 
 -- update package date and version
