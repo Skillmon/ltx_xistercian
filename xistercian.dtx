@@ -499,8 +499,8 @@ and the derived files           xistercian.pdf
 %   right rectangle. The width of that rectangle is determined by |width|, and
 %   the upper border by |height|, and with this option you can set the lower
 %   border as a fraction of the |height|. You can either just give a factor as a
-%   \meta{float}, or just pass in a divisor as an \meta{integer}, or both. An
-%   empty \meta{float} equals $1$.
+%   \meta{float}, or just pass in a divisor as an \meta{integer} (with a leading
+%   slash), or both. An empty \meta{float} equals $1$.
 % \end{function}
 % Consider the following example (result on the right):\\[\bigskipamount]
 % \begin{minipage}[c]{.8\linewidth}
@@ -600,15 +600,19 @@ and the derived files           xistercian.pdf
 %
 % \begin{function}{alternate-6,6}
 %   \begin{syntax}
-%     \cs{alternate-6} = \marg{choice} \mysdefault{dash}
+%     \cs{alternate-6} = \marg{choice} \mysdefault{stroke}
 %   \end{syntax}
-%   There are alternative forms of the digit $6$, while today the usual form is
-%   |dash|, there are also historic documents showing the $6$ as two dots, which
-%   you can achieve using the |dot| \meta{choice}.
+%   There are alternative forms of the digit $6$. While today the usual form is
+%   |stroke|, there are also historic documents showing the $6$ as two dots,
+%   which you can achieve using the |dot| \meta{choice}, and to support squares
+%   or short dashes instead of round dots you can use the |dash| choice.
 %
 %   For |dot| you can also specify the radius as a dimension. The default is
-%   \mbox{\mydefault{six@dot}}. The |dash| has always the full length and
-%   doesn't accept an additional specification (unlike for $5$s).
+%   \mbox{\mydefault{six@dot}}. And for |dash| you can also specify the length
+%   in multiples of the used stroke thickness, an empty value is considered the
+%   same as $1$. The default is \mbox{\mysdefault{\normalfont\emph{empty}}}. The
+%   |stroke| has always the full length and doesn't accept an additional
+%   specification.
 %
 %   A comparison of the alternate forms is shown in figure~\ref{fig:69}.
 % \end{function}
@@ -628,13 +632,16 @@ and the derived files           xistercian.pdf
 %   \centering
 %   \exampledigits{6666}%
 %   \cisterciansetup{vex}%
-%   \begin{tabular}{*3c}
-%     \texttt{dash}       & \texttt{dot=2pt}        & \texttt{dot=4pt}       \\
-%     \showbb{6=dash}     & \showbb{6=dot=2pt}      & \showbb{6=dot=4pt}     \\
-%     \showbb{6=dash,hex} & \showbb{6=dot=2pt,hex}  & \showbb{6=dot=4pt,hex} \\
-%   \end{tabular}\hfil
+%   \begin{tabular}{@{}*5c}
+%     \texttt{stroke}       & \texttt{dot=2pt}       & \texttt{dot=4pt}
+%                           & \texttt{dash=1}        & \texttt{dash=2}        \\
+%     \showbb{6=stroke}     & \showbb{6=dot=2pt}     & \showbb{6=dot=4pt}
+%                           & \showbb{6=dash=1}      & \showbb{6=dash=2}      \\
+%     \showbb{6=stroke,hex} & \showbb{6=dot=2pt,hex} & \showbb{6=dot=4pt,hex}
+%                           & \showbb{6=dash=1, hex} & \showbb{6=dash=2, hex} \\
+%   \end{tabular}\hfill
 %   \exampledigits{9999}%
-%   \begin{tabular}{*2c}
+%   \begin{tabular}{*2c@{}}
 %     \texttt{rectangle}       & \texttt{triangle}       \\
 %     \showbb{9=rectangle}     & \showbb{9=triangle}     \\
 %     \showbb{9=rectangle,hex} & \showbb{9=triangle,hex} \\
@@ -761,12 +768,14 @@ and the derived files           xistercian.pdf
 \newcommand*\xister@five@dot{.09ex}
 \newcommand*\xister@five@dash{}
 \newcommand*\xister@six@dot{.09ex}
+\newcommand*\xister@six@dash{}
 \newcommand*\xister@share@div{/6}
 \newcommand*\xister@share@mul{}
 \newif\ifxister@dbg@
 \newif\ifxister@five@triangle@\xister@five@triangle@true
 \newif\ifxister@five@dot@
 \newif\ifxister@six@dot@
+\newif\ifxister@six@stroke@\xister@six@stroke@true
 \newif\ifxister@nine@triangle@
 \newdimen\xister@X
 \newdimen\xister@Y
@@ -1052,13 +1061,30 @@ and the derived files           xistercian.pdf
 \ekvlet{xister}{5}\xister@five@set
 \ekvlet{xister}{alternate-5}\xister@five@set
 \let\xister@five@set\xister@undefined
-\protected\ekvdefNoVal{xister/6}{dash}{\xister@six@dot@false}
-\protected\ekvdefNoVal{xister/6}{dot}{\xister@six@dot@true}
 \protected\long\ekvdef{xister/6}{dot}
   {%
+    \xister@six@stroke@false
     \xister@six@dot@true
     \edef\xister@six@dot{\unexpanded{#1}}%
     \xister@dbg@dim{#1}%
+  }
+\protected\long\ekvdef{xister/6}{dash}
+  {%
+    \xister@six@stroke@false
+    \xister@six@dot@false
+    \edef\xister@six@dash{\unexpanded{#1}}%
+    \xister@dbg@float{#1}%
+  }
+\protected\ekvdefNoVal{xister/6}{stroke}{\xister@six@stroke@true}
+\protected\ekvdefNoVal{xister/6}{dot}
+  {%
+    \xister@six@stroke@false
+    \xister@six@dot@true
+  }
+\protected\ekvdefNoVal{xister/6}{dash}
+  {%
+    \xister@six@stroke@false
+    \xister@six@dot@false
   }
 \protected\ekvsetdef\xister@six@set{xister/6}
 \ekvlet{xister}{6}\xister@six@set
@@ -1471,21 +1497,34 @@ and the derived files           xistercian.pdf
           \copy\csname xister@digitbox@6#1\endcsname
         }%
     \fi
-    \ifxister@six@dot@
+    \unless\ifxister@six@stroke@
       \xister@drawdigit{6#1}%
         {%
-          \xister@TMPA=\dimexpr\xister@X-#3\xister@Six@dot\relax
-          \pgfpathcircle
-            {\pgfpoint\xister@TMPA
-                      {\dimexpr\xister@Y-#2\xister@Six@dot\relax}}%
-            {\xister@Six@dot}%
-          \pgfpathcircle
-            {\pgfpoint\xister@TMPA
-                      {\dimexpr\xister@XY@share+#2\xister@Six@dot\relax}}%
-            {\xister@Six@dot}%
-          \pgfusepath{fill}%
+          \ifxister@six@dot@
+            \xister@TMPA=\dimexpr\xister@X-#3\xister@Six@dot\relax
+            \pgfpathcircle
+              {\pgfpoint\xister@TMPA
+                        {\dimexpr\xister@Y-#2\xister@Six@dot\relax}}%
+              {\xister@Six@dot}%
+            \pgfpathcircle
+              {\pgfpoint\xister@TMPA
+                        {\dimexpr\xister@XY@share+#2\xister@Six@dot\relax}}%
+              {\xister@Six@dot}%
+            \pgfusepath{fill}%
+          \else
+            \xister@TMPB=\dimexpr\xister@X-#3\xister@Tv\relax
+            \xister@TMPA=2\dimexpr#2\xister@six@dash\xister@Tv\relax
+            \pgfsetlinewidth{2\xister@Tv}%
+            \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
+            \pgfpathlineto
+              {\pgfpoint\xister@TMPB
+                        {\dimexpr\xister@Y-\xister@TMPA\relax}}%
+            \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@XY@share}%
+            \pgfpathlineto
+              {\pgfpoint\xister@TMPB
+                        {\dimexpr\xister@XY@share+\xister@TMPA\relax}}%
+          \fi
         }%
-    \fi
     \fi
   }
 \newcommand\xister@drawdigits@horizontal[3]
@@ -1494,14 +1533,14 @@ and the derived files           xistercian.pdf
     \xister@drawdigit{1#1}%
       {%
         \pgfsetlinewidth{2\xister@Tv}%
-        \xister@TMPA=-\dimexpr\xister@X-#3\xister@Tv\relax
+        \xister@TMPA=\dimexpr#3\xister@Tv-\xister@X\relax
         \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
         \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
       }%
     \xister@drawdigit{2#1}%
       {%
         \pgfsetlinewidth{2\xister@Tv}%
-        \xister@TMPA=-\dimexpr#3\xister@Tv-\xister@XY@share\relax
+        \xister@TMPA=\dimexpr\xister@XY@share-#3\xister@Tv\relax
         \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
         \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
       }%
@@ -1534,12 +1573,12 @@ and the derived files           xistercian.pdf
           \pgfpathlineto{\pgfpoint{-\xister@X}\xister@Y}%
           \pgfusepath{stroke,clip}%
           \pgfsetlinewidth{2\xister@Tv}%
-          \xister@TMPA=-\dimexpr\xister@X-#3\xister@Tv\relax
+          \xister@TMPA=\dimexpr#3\xister@Tv-\xister@X\relax
           \pgfpathmoveto{\pgfpoint\xister@TMPA\z@}%
           \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
         \else\ifxister@five@dot@
           \pgfpathcircle
-            {\pgfpoint{-\dimexpr\xister@X-#3\xister@Five@dot\relax}%
+            {\pgfpoint{\dimexpr#3\xister@Five@dot-\xister@X\relax}%
                       {\dimexpr\xister@Y-#2\xister@Five@dot\relax}}%
             {\xister@Five@dot}%
           \pgfusepath{fill}%
@@ -1550,7 +1589,7 @@ and the derived files           xistercian.pdf
           \pgfpathlineto
             {%
               \pgfpoint
-                {-\dimexpr\xister@X-#3\xister@five@dash\xister@Th*2\relax}%
+                {\dimexpr#3\xister@five@dash\xister@Th*2-\xister@X\relax}%
                 \xister@TMPB
             }%
         \fi\fi
@@ -1597,19 +1636,33 @@ and the derived files           xistercian.pdf
           \copy\csname xister@digitbox@6#1\endcsname
         }%
     \fi
-    \ifxister@six@dot@
+    \unless\ifxister@six@stroke@
       \xister@drawdigit{6#1}%
         {%
-          \xister@TMPA=\dimexpr\xister@Y-#2\xister@Six@dot\relax
-          \pgfpathcircle
-            {\pgfpoint{-\dimexpr\xister@X-#3\xister@Six@dot\relax}%
-                      \xister@TMPA}%
-            {\xister@Six@dot}%
-          \pgfpathcircle
-            {\pgfpoint{\dimexpr\xister@XY@share-#3\xister@Six@dot\relax}%
-                      \xister@TMPA}%
-            {\xister@Six@dot}%
-          \pgfusepath{fill}%
+          \ifxister@six@dot@
+            \xister@TMPA=\dimexpr\xister@Y-#2\xister@Six@dot\relax
+            \pgfpathcircle
+              {\pgfpoint{\dimexpr#3\xister@Six@dot-\xister@X\relax}%
+                        \xister@TMPA}%
+              {\xister@Six@dot}%
+            \pgfpathcircle
+              {\pgfpoint{\dimexpr\xister@XY@share-#3\xister@Six@dot\relax}%
+                        \xister@TMPA}%
+              {\xister@Six@dot}%
+            \pgfusepath{fill}%
+          \else
+            \pgfsetlinewidth{2\xister@Th}%
+            \xister@TMPB=\dimexpr\xister@Y-#2\xister@Th\relax
+            \xister@TMPA=2\dimexpr#3\xister@six@dash\xister@Th\relax
+            \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
+            \pgfpathlineto
+              {\pgfpoint{\dimexpr\xister@TMPA-\xister@X\relax}%
+                        \xister@TMPB}%
+            \pgfpathmoveto{\pgfpoint\xister@XY@share\xister@TMPB}%
+            \pgfpathlineto
+              {\pgfpoint{\dimexpr\xister@XY@share-\xister@TMPA\relax}%
+                        \xister@TMPB}%
+          \fi
         }%
     \fi
   }
