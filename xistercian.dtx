@@ -117,6 +117,7 @@ and the derived files           xistercian.pdf
     \myrestoredefaults\xister@th
     \myrestoredefaults\xister@tdu
     \myrestoredefaults\xister@tdd
+    \myrestoredefaults\xister@ts
     \myrestoredefaults\xister@font
   }
 \makeatother
@@ -482,6 +483,15 @@ and the derived files           xistercian.pdf
 %   right.
 % \end{function}
 %
+% \begin{function}{stroke-s,ss}
+%   \begin{syntax}
+%     stroke-s = \marg{dimension expression} \mysdefault{empty}
+%   \end{syntax}
+%   Sets the stroke thickness of the zero stem. If this is set to an empty value
+%   the stroke thickness in vertical mode is that of |stroke-v| and in
+%   horizontal mode that of |stroke-h|.
+% \end{function}
+%
 % \begin{function}{strokes,s}
 %   \begin{syntax}
 %     stroke = \marg{dimension expression}
@@ -759,6 +769,7 @@ and the derived files           xistercian.pdf
 \newcommand*\xister@tv{.18ex}
 \newcommand*\xister@tdu{.1ex}
 \newcommand*\xister@tdd{.18ex}
+\newcommand*\xister@ts{}
 \newcommand*\xister@x{.5em}
 \newcommand*\xister@y{1.55ex}
 \newcommand*\xister@bx{1.2}
@@ -784,6 +795,7 @@ and the derived files           xistercian.pdf
 \newdimen\xister@Tv
 \newdimen\xister@Tdu
 \newdimen\xister@Tdd
+\newdimen\xister@Ts
 \newdimen\xister@TMPA
 \newdimen\xister@TMPB
 \newdimen\xister@Five@dot
@@ -989,21 +1001,27 @@ and the derived files           xistercian.pdf
   }
 \xister@tmp{wd}{width}{\edef\xister@x{\unexpanded{#1}}\xister@dbg@dim{#1}}
 \xister@tmp{ht}{height}{\edef\xister@y{\unexpanded{#1}}\xister@dbg@dim{#1}}
+\xister@tmp{bx}{bound-x}{\edef\xister@bx{\unexpanded{#1}}\xister@dbg@float{#1}}
+\xister@tmp{by}{bound-y}{\edef\xister@by{\unexpanded{#1}}\xister@dbg@float{#1}}
+\xister@tmp{bs}{baseline}{\edef\xister@bs{\unexpanded{#1}}\xister@dbg@float{#1}}
 \xister@tmp{sv}{stroke-v}{\edef\xister@tv{\unexpanded{#1}}\xister@dbg@dim{#1}}
 \xister@tmp{sh}{stroke-h}{\edef\xister@th{\unexpanded{#1}}\xister@dbg@dim{#1}}
 \xister@tmp{sdu}{stroke-du}
   {\edef\xister@tdu{\unexpanded{#1}}\xister@dbg@dim{#1}}
 \xister@tmp{sdd}{stroke-dd}
   {\edef\xister@tdd{\unexpanded{#1}}\xister@dbg@dim{#1}}
-\xister@tmp{bx}{bound-x}{\edef\xister@bx{\unexpanded{#1}}\xister@dbg@float{#1}}
-\xister@tmp{by}{bound-y}{\edef\xister@by{\unexpanded{#1}}\xister@dbg@float{#1}}
-\xister@tmp{bs}{baseline}{\edef\xister@bs{\unexpanded{#1}}\xister@dbg@float{#1}}
+\xister@tmp{ss}{stroke-s}
+  {%
+    \edef\xister@ts{\unexpanded{#1}}%
+    \unless\ifx\xister@ts\@empty\xister@dbg@dim{#1}\fi
+  }
 \xister@tmp{s}{strokes}
   {%
     \edef\xister@tv{\unexpanded{#1}}%
     \let\xister@th\xister@tv
     \let\xister@tdu\xister@tv
     \let\xister@tdd\xister@tv
+    \let\xister@ts\xister@tv
     \xister@dbg@dim{#1}%
   }
 \xister@tmp{f}{font}{\edef\xister@font{\unexpanded{#1}}}
@@ -1366,14 +1384,14 @@ and the derived files           xistercian.pdf
 \newcommand*\xister@clip@v[1]
   {%
     \pgfpathrectanglecorners
-      {\pgfpoint{\dimexpr\ifdim\xister@X<\z@-\fi\xister@Tv\relax}{#1}}%
+      {\pgfpoint{\dimexpr\ifdim\xister@X<\z@-\fi\xister@Ts\relax}{#1}}%
       {\pgfpoint\xister@X\xister@Y}%
     \pgfusepath{clip}%
   }
 \newcommand*\xister@clip@h[1]
   {%
     \pgfpathrectanglecorners
-      {\pgfpoint{#1}{-\dimexpr\ifdim\xister@Y<\z@-\fi\xister@Th\relax}}%
+      {\pgfpoint{#1}{-\dimexpr\ifdim\xister@Y<\z@-\fi\xister@Ts\relax}}%
       {\pgfpoint{-\xister@X}\xister@Y}%
     \pgfusepath{clip}%
   }
@@ -1406,7 +1424,7 @@ and the derived files           xistercian.pdf
       }%
     \xister@drawdigit{3#1}%
       {%
-        \xister@TMPB=#3\dimexpr\xister@Tv-\xister@Tdd\relax
+        \xister@TMPB=#3\dimexpr\xister@Ts-\xister@Tdd\relax
         \xister@clip@v\xister@XY@share
         \pgfsetlinewidth{2\xister@Tdd}%
         \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@XY@share}%
@@ -1416,7 +1434,7 @@ and the derived files           xistercian.pdf
     \xister@drawdigit{4#1}%
       {%
         \xister@clip@v\z@
-        \xister@TMPB=#3\dimexpr\xister@Tv-\xister@Tdu\relax
+        \xister@TMPB=#3\dimexpr\xister@Ts-\xister@Tdu\relax
         \pgfsetlinewidth{2\xister@Tdu}%
         \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
         \pgfpathlineto{\pgfpoint\xister@TMPB\xister@XY@share}%
@@ -1427,7 +1445,7 @@ and the derived files           xistercian.pdf
         \ifxister@five@triangle@
           \xister@clip@v\z@
           \xister@TMPB=%
-            #3\dimexpr\xister@Tv-\xister@Tdu\relax
+            #3\dimexpr\xister@Ts-\xister@Tdu\relax
           \pgfsetlinewidth{2\xister@Tdu}%
           \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
           \pgfpathlineto{\pgfpoint\xister@TMPB\xister@XY@share}%
@@ -1476,14 +1494,14 @@ and the derived files           xistercian.pdf
       \xister@drawdigit{9#1}%
         {%
           \xister@TMPA=.5\dimexpr\xister@XY@share+\xister@Y\relax
-          \xister@TMPB=#3\dimexpr\xister@Tv-\xister@Tdd\relax
+          \xister@TMPB=#3\dimexpr\xister@Ts-\xister@Tdd\relax
           \xister@clip@v\z@
           \pgfsetlinewidth{2\xister@Tdd}%
           \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@XY@share}%
           \pgfpathlineto{\pgfpoint\xister@TMPB\xister@Y}%
           \pgfpathlineto{\pgfpoint\xister@X\xister@TMPA}%
           \pgfusepath{stroke}%
-          \xister@TMPB=#3\dimexpr\xister@Tv-\xister@Tdu\relax
+          \xister@TMPB=#3\dimexpr\xister@Ts-\xister@Tdu\relax
           \pgfsetlinewidth{2\xister@Tdu}%
           \pgfpathmoveto{\pgfpoint\xister@TMPB\xister@Y}%
           \pgfpathlineto{\pgfpoint\xister@TMPB\xister@XY@share}%
@@ -1546,7 +1564,7 @@ and the derived files           xistercian.pdf
       }%
     \xister@drawdigit{3#1}%
       {%
-        \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdu\relax
+        \xister@TMPB=#2\dimexpr\xister@Ts-\xister@Tdu\relax
         \xister@clip@h\xister@XY@share
         \pgfsetlinewidth{2\xister@Tdu}%
         \pgfpathmoveto{\pgfpoint\xister@XY@share\xister@TMPB}%
@@ -1556,7 +1574,7 @@ and the derived files           xistercian.pdf
     \xister@drawdigit{4#1}%
       {%
         \xister@clip@h\z@
-        \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdd\relax
+        \xister@TMPB=#2\dimexpr\xister@Ts-\xister@Tdd\relax
         \pgfsetlinewidth{2\xister@Tdd}%
         \pgfpathmoveto{\pgfpoint\xister@X\xister@TMPB}%
         \pgfpathlineto{\pgfpoint\xister@XY@share\xister@TMPB}%
@@ -1566,7 +1584,7 @@ and the derived files           xistercian.pdf
       {%
         \ifxister@five@triangle@
           \xister@clip@h\z@
-          \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdd\relax
+          \xister@TMPB=#2\dimexpr\xister@Ts-\xister@Tdd\relax
           \pgfsetlinewidth{2\xister@Tdd}%
           \pgfpathmoveto{\pgfpoint{-\xister@X}\xister@TMPB}%
           \pgfpathlineto{\pgfpoint\xister@XY@share\xister@TMPB}%
@@ -1615,14 +1633,14 @@ and the derived files           xistercian.pdf
       \xister@drawdigit{9#1}%
         {%
           \xister@TMPA=.5\dimexpr\xister@XY@share-\xister@X\relax
-          \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdu\relax
+          \xister@TMPB=#2\dimexpr\xister@Ts-\xister@Tdu\relax
           \xister@clip@h\z@
           \pgfsetlinewidth{2\xister@Tdu}%
           \pgfpathmoveto{\pgfpoint\xister@XY@share\xister@TMPB}%
           \pgfpathlineto{\pgfpoint{-\xister@X}\xister@TMPB}%
           \pgfpathlineto{\pgfpoint\xister@TMPA\xister@Y}%
           \pgfusepath{stroke}%
-          \xister@TMPB=#2\dimexpr\xister@Th-\xister@Tdd\relax
+          \xister@TMPB=#2\dimexpr\xister@Ts-\xister@Tdd\relax
           \pgfsetlinewidth{2\xister@Tdd}%
           \pgfpathmoveto{\pgfpoint\xister@X\xister@TMPB}%
           \pgfpathlineto{\pgfpoint\xister@XY@share\xister@TMPB}%
@@ -1696,7 +1714,7 @@ and the derived files           xistercian.pdf
   {%
     \xister@drawdigit{0}%
       {%
-        \pgfsetlinewidth{2\xister@Tv}%
+        \pgfsetlinewidth{2\xister@Ts}%
         \pgfpathmoveto{\pgfpoint\z@{-\xister@Y}}%
         \pgfpathlineto{\pgfpoint\z@\xister@Y}%
       }%
@@ -1705,7 +1723,7 @@ and the derived files           xistercian.pdf
   {%
     \xister@drawdigit{0}%
       {%
-        \pgfsetlinewidth{2\xister@Th}%
+        \pgfsetlinewidth{2\xister@Ts}%
         \pgfpathmoveto{\pgfpoint{-\xister@X}\z@}%
         \pgfpathlineto{\pgfpoint\xister@X\z@}%
       }%
@@ -1746,6 +1764,12 @@ and the derived files           xistercian.pdf
           \xister@Tdd=\the\dimexpr.5\dimexpr\xister@tdd\relax\relax
           \xister@Five@dot=\the\dimexpr\xister@five@dot\relax
           \xister@Six@dot=\the\dimexpr\xister@six@dot\relax
+          \ifx\xister@ts\@empty
+            \xister@Ts=%
+              \ifx\xister@build\xister@build@h\xister@Th\else\xister@Tv\fi
+          \else
+            \xister@Ts=\the\dimexpr.5\dimexpr\xister@ts\relax\relax
+          \fi
         }%
     \xister@tmp
   }
