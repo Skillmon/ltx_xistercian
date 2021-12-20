@@ -317,15 +317,25 @@ and the derived files           xistercian.pdf
 %
 % \begin{function}{\cistercianstyle}
 %   \begin{syntax}
-%     \cs{cistercianstyle}\marg{name}\marg{key=value,\ldots}
+%     \cs{cistercianstyle}\meta{*}\marg{name}\marg{key=value,\ldots}
 %   \end{syntax}
 %   With this macro you can define a key called \meta{name} that'll set the
 %   options in the \meta{key=value} list if used inside |\cisterciansetup|.
-%   Only new names are allowed.
+%   Only new names are allowed. If your style shouldn't take an argument (so is
+%   fixed) use the normal variant. If your style needs to take an argument use
+%   the variant with \meta{*}.
 % \end{function}
-% For example, the key |horizontal| is equivalently defined to
+% For example, the key |horizontal| is equivalently defined to and can be used
+% as
 % \begin{verbatim}
 % \cistercianstyle{horizontal}{o=h,wd=0.775em,ht=1.13ex}
+% \cisterciansetup{horizontal}
+% \end{verbatim}
+% And if you want to define a style that at the same time changes the stroke
+% widths for vertical and horizontal strokes you could use
+% \begin{verbatim}
+% \cistercianstyle*{sh+v}{sh={#1},sv={#1}}
+% \cisterciansetup{sh+v=.12ex}
 % \end{verbatim}
 %
 %
@@ -338,10 +348,10 @@ and the derived files           xistercian.pdf
 %
 % For the options |width| and |height|, and probably also the strokes, you
 % should use dimensions using |ex| or |em| to get sizes depending on the current
-% font size. For all three of those options the \meta{dimension expression} is
-% evaluated (using the setup specified in |font|) every time the font changed
-% according to the |redraw| option's feature list (by default only when the size
-% changed) since the last time they were drawn.
+% font size. A \meta{dimension expression} is evaluated (using the setup
+% specified in |font|) every time the font changed according to the |redraw|
+% option's feature list (by default only when the size changed) since the last
+% time they were drawn.
 %
 % Initial values if present are printed on the right. A small graphic explaining
 % most of the size related options is shown in figure~\ref{fig:size}.
@@ -533,7 +543,7 @@ and the derived files           xistercian.pdf
 %   \begin{syntax}
 %     alternate-5 = \marg{choice} \mysdefault{triangle}
 %   \end{syntax}
-%   There are alternative forms of the digit $5$, while the most often used one
+%   There are alternative forms of the digit $5$. While the most often used one
 %   nowadays seems to be the |triangle| form, this package also supports two
 %   other variants. Those are called |dot| and |dash|. While if you choose
 %   |triangle| you can't give an additional value, if your choice is |dot| or
@@ -1135,17 +1145,26 @@ and the derived files           xistercian.pdf
 % \end{macro}
 %
 % \begin{macro}{\cistercianstyle}
+% \begin{macro}[internal]{\xister@style}
 %   We allow users to define a style they can call with a single key name inside
 %   |\cisterciansetup|. To achieve that we just define a |NoVal| key that'll
-%   call a nested |\cisterciansetup|.
+%   call a nested |\cisterciansetup|, or a normal key if their style needs to
+%   take a value.
 %    \begin{macrocode}
-\protected\long\def\cistercianstyle#1#2%
+\protected\def\cistercianstyle
   {%
-    \ekvifdefinedNoVal{xister}{#1}%
-      {\PackageError{xistercian}{Key `#1' already defined}{}}%
-      {\protected\ekvdefNoVal{xister}{#1}{\cisterciansetup{#2}}}%
+    \@ifstar
+      {\xister@style\ekvifdefined{\long\ekvdef}}%
+      {\xister@style\ekvifdefinedNoVal\ekvdefNoVal}%
+  }
+\protected\long\def\xister@style#1#2#3#4%
+  {%
+    #1{xister}{#3}%
+      {\PackageError{xistercian}{Key `#3' already defined}{}}%
+      {\protected#2{xister}{#3}{\cisterciansetup{#4}}}%
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\cistercian}
@@ -1466,6 +1485,7 @@ and the derived files           xistercian.pdf
             {\xister@Six@dot}%
           \pgfusepath{fill}%
         }%
+    \fi
     \fi
   }
 \newcommand\xister@drawdigits@horizontal[3]
