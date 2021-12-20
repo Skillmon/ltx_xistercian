@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 # xistercian -- Cistercian numerals in LaTeX
 
-Version 2021-11-23 v1.1a
+Version 2021-12-20 v1.2
 
 Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt
