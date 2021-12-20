@@ -80,32 +80,38 @@ and the derived files           xistercian.pdf
       \cisterciannum{#1}^^A
     \endgroup
   }
-\newcommand*\mydefault[1]
-  {^^A
-    \begingroup
-      \color{darkgray}^^A
-      \myrestoredefaults
-      \hfill
-      \texttt
-        {^^A
-          \detokenize\expandafter\expandafter\expandafter
-            {\csname xister@#1\endcsname}^^A
-          \unskip
-        }^^A
-    \endgroup
-  }
-\newcommand*\mysdefault[1]
-  {^^A
-    \begingroup
-      \color{darkgray}^^A
-      \myrestoredefaults
-      \hfill
-      \texttt{#1}^^A
-    \endgroup
-  }
 \pagenumbering{cistercian}
 \ExplSyntaxOn
 \makeatletter
+\AddToHook{env/syntax/begin}{\let\myhfill\hfill}
+\let\myhfill\@empty
+\newcommand*\mydefault[1]
+  {
+    \begingroup
+      \color{darkgray}
+      \myrestoredefaults
+      \myhfill
+      \texttt
+        {
+          \expandafter\ifx\csname xister@#1\endcsname\@empty
+            \normalfont\emph{empty}
+          \else
+            \detokenize\expandafter\expandafter\expandafter
+              {\csname xister@#1\endcsname}
+            \unskip
+          \fi
+        }
+    \endgroup
+  }
+\newcommand*\mysdefault[1]
+  {
+    \begingroup
+      \color{darkgray}
+      \myrestoredefaults
+      \myhfill
+      \texttt { \str_if_eq:nnTF {#1} { empty } { \normalfont \emph{#1} } {#1} }
+    \endgroup
+  }
 \def\myrestoredefaults#1{\def\unexpanded{#1}{\unexpanded\expandafter{#1}}}
 \edef\myrestoredefaults
   {
@@ -438,7 +444,7 @@ and the derived files           xistercian.pdf
 %
 % \begin{function}{bound-y,by}
 %   \begin{syntax}
-%     bound-y = \marg{float} \mysdefault{\normalfont\emph{empty}}
+%     bound-y = \marg{float} \mydefault{by}
 %   \end{syntax}
 %   Specifies the factor the bounding box in $y$-direction is bigger than the
 %   |height|. An empty \meta{float} is considered the same as $1$.
@@ -446,7 +452,7 @@ and the derived files           xistercian.pdf
 %
 % \begin{function}{baseline,bs}
 %   \begin{syntax}
-%     baseline = \marg{float} \mysdefault{\normalfont\emph{empty}}
+%     baseline = \marg{float} \mydefault{bs}
 %   \end{syntax}
 %   Sets the baseline of the symbols in multiples of the negative height. $1$
 %   (or empty) results in the symbol starting on the surrounding baseline,
@@ -485,7 +491,7 @@ and the derived files           xistercian.pdf
 %
 % \begin{function}{stroke-s,ss}
 %   \begin{syntax}
-%     stroke-s = \marg{dimension expression} \mysdefault{empty}
+%     stroke-s = \marg{dimension expression} \mydefault{ts}
 %   \end{syntax}
 %   Sets the stroke thickness of the zero stem. If this is set to an empty value
 %   the stroke thickness in vertical mode is that of |stroke-v| and in
@@ -562,13 +568,13 @@ and the derived files           xistercian.pdf
 %   value if you changed the value at some point in time).
 %
 %   For |dot| you can also specify the radius as a dimension. The default is
-%   \mbox{\mydefault{five@dot}}.
+%   \mydefault{five@dot}.
 %
 %   For |dash| you can specify the length of the dash in multiples of the used
 %   stroke thickness (which might differ for the horizontal and vertical
 %   symbols), an empty value is considered the same as $1$. The default is
-%   \mbox{\mysdefault{\normalfont\emph{empty}}}. Please ensure that your readers
-%   can't confuse the results with the shape of $6$.
+%   \mysdefault{empty}. Please ensure that your readers can't confuse the
+%   results with the shape of $6$.
 %
 %   A comparison of the three alternate forms is shown in
 %   figure~\ref{fig:fives}.
@@ -614,15 +620,14 @@ and the derived files           xistercian.pdf
 %   \end{syntax}
 %   There are alternative forms of the digit $6$. While today the usual form is
 %   |stroke|, there are also historic documents showing the $6$ as two dots,
-%   which you can achieve using the |dot| \meta{choice}, and to support squares
-%   or short dashes instead of round dots you can use the |dash| choice.
+%   which you can achieve using the |dot| choice, and to support squares or
+%   short dashes instead of round dots you can use the |dash| choice.
 %
 %   For |dot| you can also specify the radius as a dimension. The default is
-%   \mbox{\mydefault{six@dot}}. And for |dash| you can also specify the length
-%   in multiples of the used stroke thickness, an empty value is considered the
-%   same as $1$. The default is \mbox{\mysdefault{\normalfont\emph{empty}}}. The
-%   |stroke| has always the full length and doesn't accept an additional
-%   specification.
+%   \mydefault{six@dot}. And for |dash| you can also specify the length in
+%   multiples of the used stroke thickness, an empty value is considered the
+%   same as $1$. The default is \mysdefault{empty}. The |stroke| has always the
+%   full length and doesn't accept an additional specification.
 %
 %   A comparison of the alternate forms is shown in figure~\ref{fig:69}.
 % \end{function}
