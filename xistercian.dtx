@@ -999,6 +999,11 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \ekvifdefinedset{xister}
   {\PackageError{xistercian}{keyval conflict detected. Aborting}{}\endinput}{}
+%    \end{macrocode}
+% We'll define a shorthand name and a long name for all the keys, so we set up
+% an auxiliary here for these definitions that'll just take two key names
+% instead of one for each definition.
+%    \begin{macrocode}
 \def\xister@tmp#1#2#3%
   {%
     \protected\long\ekvdef{xister}{#1}{#3}%
@@ -1080,10 +1085,13 @@ and the derived files           xistercian.pdf
     \xister@five@triangle@false
     \xister@five@dot@false
   }
-\protected\ekvsetdef\xister@five@set{xister/5}
-\ekvlet{xister}{5}\xister@five@set
-\ekvlet{xister}{alternate-5}\xister@five@set
-\let\xister@five@set\xister@undefined
+%    \end{macrocode}
+% Starting here the |\xister@tmp| macro is no longer the shorthand for the
+% doubled definitions!
+%    \begin{macrocode}
+\protected\ekvsetdef\xister@tmp{xister/5}
+\ekvlet{xister}{5}\xister@tmp
+\ekvlet{xister}{alternate-5}\xister@tmp
 \protected\long\ekvdef{xister/6}{dot}
   {%
     \xister@six@stroke@false
@@ -1109,15 +1117,14 @@ and the derived files           xistercian.pdf
     \xister@six@stroke@false
     \xister@six@dot@false
   }
-\protected\ekvsetdef\xister@six@set{xister/6}
-\ekvlet{xister}{6}\xister@six@set
-\ekvlet{xister}{alternate-6}\xister@six@set
-\let\xister@six@set\xister@undefined
+\protected\ekvsetdef\xister@tmp{xister/6}
+\ekvlet{xister}{6}\xister@tmp
+\ekvlet{xister}{alternate-6}\xister@tmp
 \protected\ekvdefNoVal{xister/9}{rectangle}{\xister@nine@triangle@false}
 \protected\ekvdefNoVal{xister/9}{triangle}{\xister@nine@triangle@true}
-\protected\ekvsetdef\xister@nine@set{xister/9}
-\ekvlet{xister}{9}\xister@nine@set
-\ekvlet{xister}{alternate-9}\xister@nine@set
+\protected\ekvsetdef\xister@tmp{xister/9}
+\ekvlet{xister}{9}\xister@tmp
+\ekvlet{xister}{alternate-9}\xister@tmp
 \protected\ekvdefNoVal{xister}{horizontal}
   {%
     \let\xister@build\xister@build@horizontal
@@ -1751,8 +1758,8 @@ and the derived files           xistercian.pdf
 % \begin{macro}[internal]{\xister@setlengths}
 %   Lengths are set depending on the current font size and the sizes of
 %   |\xister@font|. To keep the font changes local they are kept inside a group
-%   and a chain of |\expandafter|s is used to evaluate the user specified sizes
-%   while the |\xister@font| is still active.
+%   and a full expansion is used to evaluate the user specified sizes while the
+%   |\xister@font| is still active.
 %    \begin{macrocode}
 \protected\def\xister@setlengths
   {%
@@ -1782,13 +1789,10 @@ and the derived files           xistercian.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]{\xister@ensure@current}
-%   The glyphs have to be rebuilt if the font size or colour changed. The latter
-%   is an annoyance because we can build boxes in a way that they change colour
-%   to the surrounding colour, but \pkg{PGF} is too intelligent here and does
-%   issue the corresponding |\special|s to save the current colour for the box.
-%   Because of that we test which |\f@size| and colour (using |\\color@.|) was
-%   active when we last built the glyphs. If this matches we do nothing, else we
-%   rebuild the glyphs.
+%   The glyphs have to be rebuilt if the relevant font features changed (as
+%   specified in \cs[no-index]{xister@fontfeatures}).
+%   If all these font features match with whatever was active when we last built
+%   the glyphs we do nothing, else we rebuild them.
 %
 %   The |\edef| is just used to remove the |debug| code if it isn't necessary.
 %    \begin{macrocode}
