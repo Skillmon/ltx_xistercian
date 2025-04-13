@@ -153,10 +153,10 @@ and the derived files           xistercian.pdf
       \rlap
         {
           \textcolor{red}
-            {\fbox{\phantom{\cisterciannumE{\l__xisterexample_digit_tl}}}}
+            {\fbox{\phantom{\cistercianeval{\l__xisterexample_digit_tl}}}}
         }
       \kern.5\fboxrule
-      \cisterciannumE{\l__xisterexample_digit_tl}
+      \cistercianeval{\l__xisterexample_digit_tl}
       \kern.5\fboxrule
     \endgroup
   }
@@ -294,9 +294,9 @@ and the derived files           xistercian.pdf
 %   size.
 % \end{function}
 %
-% \begin{function}{\cisterciannumE}
+% \begin{function}{\cistercianeval}
 %   \begin{syntax}
-%     \cs{cisterciannumE}\marg{integer expression}
+%     \cs{cistercianeval}\marg{integer expression}
 %   \end{syntax}
 %   Evaluates the \meta{integer expression} and prints the result as a
 %   Cistercian numeral.
@@ -1256,10 +1256,12 @@ and the derived files           xistercian.pdf
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\cisterciannumE}
+% \begin{macro}{\cistercianeval,\cisterciannumE}
+%   The second macro is just there for backwards compatibility and deprecated.
 %    \begin{macrocode}
-\newcommand\cisterciannumE[1]
+\newcommand\cistercianeval[1]
   {\expandafter\cisterciannum\expandafter{\the\numexpr#1\relax}}
+\let\cisterciannumE\cistercianeval
 %    \end{macrocode}
 % \end{macro}
 %
