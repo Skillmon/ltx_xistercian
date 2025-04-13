@@ -1292,10 +1292,21 @@ and the derived files           xistercian.pdf
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\cistercianeval}
+% \begin{macro}{\cistercianeval,\cisterciannumE}
+%   The second macro is just there for backwards compatibility and deprecated.
 %    \begin{macrocode}
 \newcommand\cistercianeval[1]
   {\expandafter\cisterciannum\expandafter{\the\numexpr#1\relax}}
+\protected\def\cisterciannumE
+  {%
+    \PackageError{xistercian}
+      {%
+        Deprecated command \string\cisterciannumE.\MessageBreak
+        Use \string\cistercianeval\space instead%
+      }%
+      {}%
+    \cistercianeval
+  }
 %    \end{macrocode}
 % \end{macro}
 %
