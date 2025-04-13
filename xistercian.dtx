@@ -1145,29 +1145,33 @@ and the derived files           xistercian.pdf
 \protected\ekvdefNoVal{xister}{debug}
   {%
     \xister@dbg@true
+    \protected\long\def\xister@dbg@msg##1%
+      {%
+        \begingroup
+          \newlinechar`\^^J
+          \message{##1}%
+        \endgroup
+      }%
+    \protected\long\def\xister@dbg@do##1%
+      {\xister@dbg@msg{^^JPackage xistercian Debug: ##1...}}%
+    \protected\long\def\xister@dbg@done{\xister@dbg@msg{ Done.^^J}}%
     \protected\long\def\xister@dbg@dim##1%
       {%
-        \typeout
-          {%
-            Package xistercian Debug: Trying to use dimension
-            `\unexpanded{##1}'.%
-          }%
+        \xister@dbg@do{Trying to use dimension `\unexpanded{##1}'}%
         \xister@TMPA=\dimexpr##1\relax
-        \typeout{Package xistercian Debug: Done.}%
+        \xister@dbg@done
       }%
     \protected\long\def\xister@dbg@float##1%
       {%
-        \typeout
-          {Package xistercian Debug: Trying to use float `\unexpanded{##1}'.}%
+        \xister@dbg@do{Trying to use float `\unexpanded{##1}'}%
         \xister@TMPA=##1\z@
-        \typeout{Package xistercian Debug: Done.}%
+        \xister@dbg@done
       }%
     \protected\long\def\xister@dbg@div##1%
       {%
-        \typeout
-          {Package xistercian Debug: Trying to use divisor `\unexpanded{##1}'.}%
+        \xister@dbg@do{Trying to use divisor `\unexpanded{##1}'}%
         \xister@TMPA=\dimexpr\z@/##1\relax
-        \typeout{Package xistercian Debug: Done.}%
+        \xister@dbg@done
       }%
   }
 %    \end{macrocode}
@@ -1806,13 +1810,7 @@ and the derived files           xistercian.pdf
     \unexpanded{\unless\ifx\xister@tmp\xister@last@font}%
       \ifxister@dbg@
         \unexpanded
-          {%
-            \typeout
-              {%
-                Package xistercian Debug: Font changed. Building glyphs for
-                \xister@tmp.
-              }%
-          }%
+          {\xister@dbg@do{Font changed. Building glyphs for \xister@tmp}}%
       \fi
     \unexpanded
       {%
@@ -1820,7 +1818,7 @@ and the derived files           xistercian.pdf
           \xister@build
       }%
       \ifxister@dbg@
-        \unexpanded{\typeout{Package xistercian Debug: Done.}}%
+        \unexpanded{\xister@dbg@done}%
       \fi
     \unexpanded{\fi}%
   }
