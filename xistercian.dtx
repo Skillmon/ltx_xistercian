@@ -164,11 +164,41 @@ and the derived files           xistercian.pdf
 \cistercianstyle{.ex}{sv=3pt,sdd=3pt,sh=2pt,sdu=2pt}
 \cistercianstyle{vex}{o=v,bx=,by=,wd=7mm,ht=14mm,.ex}
 \cistercianstyle{hex}{o=h,bx=,by=,ht=7mm,wd=14mm,.ex}
+\newcommand\setversion{}
 \ExplSyntaxOff
+\protected\def\setversion#1-#2-#3 v#4\relax
+  {%
+    \year=#1\relax
+    \month=#2\relax
+    \day=#3\relax
+    \def\xistercianversion{#4}%
+  }
+\setversion 2025-04-13 v1.3\relax
+\newcommand\twodigits[1]{\ifnum#1<10 0\fi\the#1}
+\newcommand\expkvLogo% >>=
+  {%
+    \begingroup
+      \rmfamily
+      \bfseries
+      {\color{ekvgrey}e\kern-.05em x\kern-.05em}%
+      \lower.493ex\hbox{{\color{ekvgrey}P}\kern-.1em{\color{ekvred}k}}%
+      \kern-.18em{\color{ekvred}v}%
+    \endgroup
+  }
+\definecolor{ekvred}{HTML}{9F393D}
+\colorlet{ekvgrey}{black!75}
+% =<<
 \begin{document}
   \title{The \pkg{xistercian} package}
   \author{Jonathan P. Spratte\thanks{\protect\randomize{jspratte@yahoo.de}}}
-  \date{2025-04-13 v1.3}
+  \date
+    {%
+      \begin{tabular}{@{}c*2{@{-}c}@{}}
+        \twodigits\year      & \twodigits\month      & \twodigits\day      \\
+        \cistercianeval\year & \cistercianeval\month & \cistercianeval\day
+      \end{tabular}
+      \quad v\xistercianversion
+    }
   \DocInput{xistercian.dtx}
 \end{document}
 %</driver>^^A=<<
@@ -350,10 +380,12 @@ and the derived files           xistercian.pdf
 %
 % \subsection{Options}
 %
-% The options described here are all usable as package options (except when
-% explicitly stated otherwise). \pkg{xistercian} doesn't parse the global
-% options provided to the documentclass. Additionally you can change the
-% options (except for the |debug| option) using |\cisterciansetup|.
+% The options\footnote{\meta{key}=\meta{value} interface powered by
+% \href{https://ctan.org/pkg/expkv-bundle}{\expkvLogo}} described here are all
+% usable as package options (except when explicitly stated otherwise).
+% \pkg{xistercian} doesn't parse the global options provided to the
+% documentclass. Additionally you can change the options (except for the |debug|
+% option) using |\cisterciansetup|.
 %
 % For the options |width| and |height|, and probably also the strokes, you
 % should use dimensions using |ex| or |em| to get sizes depending on the current
