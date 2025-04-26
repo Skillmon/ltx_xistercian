@@ -856,7 +856,7 @@ and the derived files           xistercian.pdf
 \expandafter\newsavebox\csname xister@digitbox@0\endcsname
 %    \end{macrocode}
 %
-% \begin{macro}[internal]{\xister@dbg@dim,\xister@dbg@float}
+% \begin{macro}[internal]{\xister@dbg@dim,\xister@dbg@div,\xister@dbg@float}
 %   These are initially just |\@gobble|, but the |debug| option might change
 %   things.
 %    \begin{macrocode}
@@ -871,25 +871,30 @@ and the derived files           xistercian.pdf
 %
 % Some macros are required to parse options.
 %
-% \begin{macro}[internal]{\xister@if@slash}
-%   We need to test whether a slash is inside an argument to parse some user
-%   option. Since this isn't needed inside an inner loop we don't create an
-%   optimised version and only borrow a generic \pkg{expl3} function.
-%    \begin{macrocode}
-\ExplSyntaxOn
-\cs_new_protected:Npn \xister@if@slash #1 { \tl_if_in:nnTF {#1} { / } }
-\ExplSyntaxOff
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}[internal]{\xister@fraction}
+%   The divisor is stored with a leading |/| if given, that way upon usage we
+%   can simply place the macro in an expression without any checks there.
+%
+%   The macro should be used as |\xister@fraction|\meta{input}|//{}\xister@stop|
+%   to parse a single \meta{input} into factor and divisor.
+%
+%   Now there are two cases:
+%   \begin{enumerate}
+%     \item the \meta{input} containing a |/|, in which case |#1| will be the
+%       (possibly empty) factor, |#2| will be the divisor, and |#3| will be the
+%       second |/| placed after \meta{input} in the usage.
+%     \item the \meta{input} doesn't contain a |/|, in which case |#1| will be
+%       the entire \meta{input}, |#2| will be empty (the contents between the
+%       two |/| placed after \meta{input}), and |#3| will also be empty (the
+%       |{}| in the usage).
+%   \end{enumerate}
 %    \begin{macrocode}
-\protected\long\def\xister@fraction#1/#2\xister@stop
+\protected\long\def\xister@fraction#1/#2/#3#4\xister@stop
   {%
     \edef\xister@share@mul{\unexpanded{#1}}%
     \xister@dbg@float{#1}%
-    \edef\xister@share@div{/\unexpanded{#2}}%
-    \xister@dbg@div{#2}%
+    \edef\xister@share@div{\unexpanded{#3#2}}%
+    \xister@dbg@div{#3#2}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1079,16 +1084,7 @@ and the derived files           xistercian.pdf
       \expandafter\let\expandafter\xister@build\csname xister@build@#1\endcsname
     \fi
   }
-\xister@tmp{fr}{fraction}
-  {%
-    \xister@if@slash{#1}%
-      {\xister@fraction#1\xister@stop}%
-      {%
-        \let\xister@share@div\@empty
-        \edef\xister@share@mul{\unexpanded{#1}}%
-        \xister@dbg@float{#1}%
-      }%
-  }
+\xister@tmp{fr}{fraction}{\xister@fraction#1//{}\xister@stop}
 \xister@tmp{r}{redraw}
   {\let\xister@fontfeatures\@empty\ekvcsvloop\xister@add@fontfeature{#1}}
 \xister@tmp{r+}{redraw+}{\ekvcsvloop\xister@add@fontfeature{#1}}
@@ -1172,6 +1168,13 @@ and the derived files           xistercian.pdf
     \def\xister@y{1.55ex}%
   }
 %    \end{macrocode}
+% \begin{macro}[internal]
+%   {
+%     \xister@dbg,
+%     \xister@dbg@msg,\xister@dbg@do,\xister@dbg@done,
+%     \xister@dbg@cleanup,\xister@dbg@cleanup@,
+%     \xister@dbg@dim,\xister@dbg@div,\xister@dbg@float
+%   }
 % The |debug| option redefines the debug macros to the correct definition.
 %    \begin{macrocode}
 \protected\ekvdefNoVal{xister}{debug}
@@ -1185,28 +1188,43 @@ and the derived files           xistercian.pdf
         \endgroup
       }%
     \protected\long\def\xister@dbg@do##1%
-      {\xister@dbg@msg{^^JPackage xistercian Debug: ##1...}}%
+      {\xister@dbg@msg{^^JPackage xistercian Debug: ##1...}}
     \protected\long\def\xister@dbg@done{\xister@dbg@msg{ Done.^^J}}%
-    \protected\long\def\xister@dbg@dim##1%
+    \protected\long\def\xister@dbg##1##2%
       {%
-        \xister@dbg@do{Trying to use dimension `\unexpanded{##1}'}%
-        \xister@TMPA=\dimexpr##1\relax
+        \xister@dbg@do{##1}%
+          \afterassignment\xister@dbg@cleanup
+          \iffalse{\fi\xister@TMPA=##2}%
         \xister@dbg@done
       }%
-    \protected\long\def\xister@dbg@float##1%
+    \protected\long\def\xister@dbg@cleanup
+      {\expandafter\xister@dbg@cleanup@\expandafter{\iffalse}\fi}
+    \protected\long\def\xister@dbg@cleanup@##1%
       {%
-        \xister@dbg@do{Trying to use float `\unexpanded{##1}'}%
-        \xister@TMPA=##1\z@
-        \xister@dbg@done
+        \if\relax\detokenize{##1}\relax
+          \expandafter\@gobblefour
+        \fi
+        \PackageError{xistercian}%
+          {Premature termination of expression. Extraneous material found: ##1}%
+          {}%
+      }
+    \protected\long\def\xister@dbg@dim##1%
+      {%
+        \xister@dbg
+          {Trying to use dimension `\unexpanded{##1}'}%
+          {\dimexpr##1\relax}%
       }%
     \protected\long\def\xister@dbg@div##1%
       {%
-        \xister@dbg@do{Trying to use divisor `\unexpanded{##1}'}%
-        \xister@TMPA=\dimexpr\z@/##1\relax
-        \xister@dbg@done
+        \xister@dbg
+          {Trying to use divisor `\unexpanded{##1}'}%
+          {\dimexpr\z@##1\relax}%
       }%
+    \protected\long\def\xister@dbg@float##1%
+      {\xister@dbg{Trying to use float `\unexpanded{##1}'}{##1\z@}}%
   }
 %    \end{macrocode}
+% \end{macro}
 % and parse the package options (and since the used names |width|, |height|, and
 % |debug| are quite frequent we don't look at the global options).
 %    \begin{macrocode}
@@ -1225,7 +1243,7 @@ and the derived files           xistercian.pdf
 % error:
 %    \begin{macrocode}
 \ekvdefNoVal{xister}{debug}
-  {\PackageError{xister}{`debug' is only available as a load time option}{}}
+  {\PackageError{xistercian}{`debug' is only available as a load time option}{}}
 %    \end{macrocode}
 %
 %
