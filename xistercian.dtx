@@ -127,16 +127,16 @@ and the derived files           xistercian.pdf
     \myrestoredefaults\xister@font
   }
 \makeatother
-\newcommand\examplerow[1]
+\NewDocumentCommand\examplerow{sm}
   {
-    \cisterciannum{1#1}&\cisterciannum{2#1}&\cisterciannum{3#1}&
-    \cisterciannum{4#1}&\cisterciannum{5#1}&\cisterciannum{6#1}&
-    \cisterciannum{7#1}&\cisterciannum{8#1}&\cisterciannum{9#1}\\
+    \cisterciannum{1#2}&\cisterciannum{2#2}&\cisterciannum{3#2}&
+    \cisterciannum{4#2}&\cisterciannum{5#2}&\cisterciannum{6#2}&
+    \cisterciannum{7#2}&\cisterciannum{8#2}&\cisterciannum{9#2}\\
     \noalign{\vskip-.5ex}
-    $1#1$&$2#1$&$3#1$&
-    $4#1$&$5#1$&$6#1$&
-    $7#1$&$8#1$&$9#1$\\
-    \noalign{\vskip1ex}
+    $1#2$&$2#2$&$3#2$&
+    $4#2$&$5#2$&$6#2$&
+    $7#2$&$8#2$&$9#2$\\
+    \IfBooleanF{#1}{\noalign{\vskip1ex}}
   }
 \AddToHook{bfseries}
   {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.625em}}
@@ -255,7 +255,7 @@ and the derived files           xistercian.pdf
 %     \examplerow{}
 %     \examplerow{0}
 %     \examplerow{00}
-%     \examplerow{000}
+%     \examplerow*{000}
 %   \end{tabular}
 %   \caption{The different base glyphs in vertical mode\label{fig:glyphs}}
 % \end{figure}
@@ -268,7 +268,7 @@ and the derived files           xistercian.pdf
 %     \examplerow{}
 %     \examplerow{0}
 %     \examplerow{00}
-%     \examplerow{000}
+%     \examplerow*{000}
 %   \end{tabular}
 %   \caption{The different base glyphs in horizontal mode\label{fig:glyphs:h}}
 % \end{figure}
