@@ -139,7 +139,10 @@ and the derived files           xistercian.pdf
     \IfBooleanF{#1}{\noalign{\vskip1ex}}
   }
 \AddToHook{bfseries}
-  {\cisterciansetup{sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.625em}}
+  {%
+    \cisterciansetup
+      {debug=off,sv=.27ex,sdd=.27ex,sh=.12ex,sdu=.12ex,wd=.625em,debug=on}%
+  }
 \AddToHook{mdseries}{\myrestoredefaults}
 \cisterciansetup{redraw+=series}
 \tl_new:N \l__xisterexample_digit_tl
@@ -384,8 +387,8 @@ and the derived files           xistercian.pdf
 % \href{https://ctan.org/pkg/expkv-bundle}{\expkvLogo}} described here are all
 % usable as package options (except when explicitly stated otherwise).
 % \pkg{xistercian} doesn't parse the global options provided to the
-% documentclass. Additionally you can change the options (except for the |debug|
-% option) using |\cisterciansetup|.
+% documentclass. Additionally you can change the options using
+% |\cisterciansetup|.
 %
 % For the options |width| and |height|, and probably also the strokes, you
 % should use dimensions using |ex| or |em| to get sizes depending on the current
@@ -739,15 +742,21 @@ and the derived files           xistercian.pdf
 % \begin{function}{debug}
 %   \begin{syntax}
 %     debug
+%     debug = \marg{on\/$\vert$off}
 %   \end{syntax}
-%   Only usable as a package option. If this is used a bit of debugging
-%   information is printed in the log file and terminal, and some keys try to
-%   evaluate the given argument on the spot instead of lazily. This might help
-%   to locate faulty input.
+%   If this is used without a value or with |on| a bit of debugging information
+%   is printed in the log file and terminal, and some keys try to evaluate the
+%   given argument on the spot instead of lazily. This might help to locate
+%   faulty input.
+%
+%   With |debug=off| you can locally turn off the debug code (this documentation
+%   for instance uses this to suppress the debug messages every time the font
+%   changes to bold because it uses a setup akin to the one shown in
+%   \autoref{sec:bf}).
 % \end{function}
 %
 %
-% \subsection{Bold Cistercian Numerals}
+% \subsection{Bold Cistercian Numerals\label{sec:bf}}
 %
 % While the package doesn't directly support bold glyphs, it is possible to
 % utilize the hooks provided by the NFSS to pick different stroke widths
@@ -821,7 +830,6 @@ and the derived files           xistercian.pdf
 \newcommand*\xister@six@dash{}
 \newcommand*\xister@share@div{/6}
 \newcommand*\xister@share@mul{}
-\newif\ifxister@dbg@
 \newif\ifxister@five@triangle@\xister@five@triangle@true
 \newif\ifxister@five@dot@
 \newif\ifxister@six@dot@
@@ -855,16 +863,6 @@ and the derived files           xistercian.pdf
 \ExplSyntaxOff
 \expandafter\newsavebox\csname xister@digitbox@0\endcsname
 %    \end{macrocode}
-%
-% \begin{macro}[internal]{\xister@dbg@dim,\xister@dbg@div,\xister@dbg@float}
-%   These are initially just |\@gobble|, but the |debug| option might change
-%   things.
-%    \begin{macrocode}
-\let\xister@dbg@dim\@gobble
-\let\xister@dbg@div\@gobble
-\let\xister@dbg@float\@gobble
-%    \end{macrocode}
-% \end{macro}
 %
 %
 % \subsection{Options}
@@ -972,14 +970,9 @@ and the derived files           xistercian.pdf
 %    \begin{macrocode}
 \protected\long\def\xister@add@fontfeature#1%
   {%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx
-        \csname xister@add@fontfeature@\detokenize{#1}\endcsname
-        \relax
-      \PackageError{xistercian}{Unsupported font feature `\detokenize{#1}'.}{}%
-    \else
-      \csname xister@add@fontfeature@\detokenize{#1}\endcsname
-    \fi
+    \@ifundefined{xister@add@fontfeature@\detokenize{#1}}%
+      {\PackageError{xistercian}{Unsupported font feature `\detokenize{#1}'.}{}}
+      {\csname xister@add@fontfeature@\detokenize{#1}\endcsname}%
   }
 \def\xister@fontfeatures{\unexpanded\expandafter{\f@size}/}
 %    \end{macrocode}
@@ -1076,13 +1069,16 @@ and the derived files           xistercian.pdf
 \xister@tmp{f}{font}{\edef\xister@font{\unexpanded{#1}}}
 \xister@tmp{o}{orientation}
   {%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname xister@build@#1\endcsname\relax
-      \PackageError{xister}%
-        {Unaccepted orientation. Choices are horizontal/h or vertical/v}{}%
-    \else
-      \expandafter\let\expandafter\xister@build\csname xister@build@#1\endcsname
-    \fi
+    \@ifundefined{xister@build@\detokenize{#1}}
+      {%
+        \PackageError{xister}%
+          {Unaccepted orientation `\detokenize{#1}'.}
+          {The allowed choices are horizontal, h, vertical, and v}%
+      }%
+      {%
+        \expandafter\let\expandafter\xister@build
+          \csname xister@build@\detokenize{#1}\endcsname
+      }%
   }
 \xister@tmp{fr}{fraction}{\xister@fraction#1//{}\xister@stop}
 \xister@tmp{r}{redraw}
@@ -1170,36 +1166,74 @@ and the derived files           xistercian.pdf
 %    \end{macrocode}
 % \begin{macro}[internal]
 %   {
-%     \xister@dbg,
+%     \xister@dbg@dim,\xister@dbg@div,\xister@dbg@float,
+%     \xister@dbg@set@on,\xister@dbg@set@off,
 %     \xister@dbg@msg,\xister@dbg@do,\xister@dbg@done,
-%     \xister@dbg@cleanup,\xister@dbg@cleanup@,
-%     \xister@dbg@dim,\xister@dbg@div,\xister@dbg@float
+%     \xister@dbg@run,\xister@dbg@run@cleanup,\xister@dbg@run@cleanup@
 %   }
-% The |debug| option redefines the debug macros to the correct definition.
+%   The |debug| option redefines the debug macros to the correct definition. We
+%   initialize them to do nothing. But if |debug| is |on| they try to evaluate
+%   the arguments.
 %    \begin{macrocode}
-\protected\ekvdefNoVal{xister}{debug}
+\protected\ekvdef{xister}{debug}
   {%
-    \xister@dbg@true
-    \protected\long\def\xister@dbg@msg##1%
+    \@ifundefined{xister@dbg@set@\detokenize{#1}}%
       {%
-        \begingroup
-          \newlinechar`\^^J
-          \message{##1}%
-        \endgroup
+        \PackageError{xistercian}
+          {Unsupported debug value `\detokenize{#1}'}
+          {The allowed choices are on and off}%
       }%
+      {\csname xister@dbg@set@\detokenize{#1}\endcsname}%
+  }
+\protected\ekvdefNoVal{xister}{debug}{\xister@dbg@set@on}
+%    \end{macrocode}
+%   The macros let to do nothing are the ones used throughout the package to
+%   call the debug code, the rest of the macros defined here are internal
+%   auxiliaries.
+%    \begin{macrocode}
+\protected\def\xister@dbg@set@off
+  {%
+    \let\xister@dbg@do\@gobble
+    \let\xister@dbg@done\@empty
+    \let\xister@dbg@dim\@gobble
+    \let\xister@dbg@div\@gobble
+    \let\xister@dbg@float\@gobble
+  }
+\xister@dbg@set@off
+%    \end{macrocode}
+%   This might redefine the internals not really affected by |set@on| or
+%   |set@off|, but that shouldn't hurt (this is unlikely, and if |debug| is
+%   really used the overhead elsewhere is likely bigger).
+%    \begin{macrocode}
+\protected\def\xister@dbg@set@on
+  {%
+    \protected\long\def\xister@dbg@dim##1%
+      {%
+        \xister@dbg@run
+          {Trying to use dimension `\unexpanded{##1}'}%
+          {\dimexpr##1\relax}%
+      }%
+    \protected\long\def\xister@dbg@div##1%
+      {%
+        \xister@dbg@run
+          {Trying to use divisor `\unexpanded{##1}'}%
+          {\dimexpr\z@##1\relax}%
+      }%
+    \protected\long\def\xister@dbg@float##1%
+      {\xister@dbg@run{Trying to use float `\unexpanded{##1}'}{##1\z@}}%
     \protected\long\def\xister@dbg@do##1%
       {\xister@dbg@msg{^^JPackage xistercian Debug: ##1...}}
     \protected\long\def\xister@dbg@done{\xister@dbg@msg{ Done.^^J}}%
-    \protected\long\def\xister@dbg##1##2%
+    \protected\long\def\xister@dbg@run##1##2%
       {%
         \xister@dbg@do{##1}%
-          \afterassignment\xister@dbg@cleanup
+          \afterassignment\xister@dbg@run@cleanup
           \iffalse{\fi\xister@TMPA=##2}%
         \xister@dbg@done
       }%
-    \protected\long\def\xister@dbg@cleanup
-      {\expandafter\xister@dbg@cleanup@\expandafter{\iffalse}\fi}
-    \protected\long\def\xister@dbg@cleanup@##1%
+    \protected\long\def\xister@dbg@run@cleanup
+      {\expandafter\xister@dbg@run@cleanup@\expandafter{\iffalse}\fi}
+    \protected\long\def\xister@dbg@run@cleanup@##1%
       {%
         \if\relax\detokenize{##1}\relax
           \expandafter\@gobblefour
@@ -1208,20 +1242,13 @@ and the derived files           xistercian.pdf
           {Premature termination of expression. Extraneous material found: ##1}%
           {}%
       }
-    \protected\long\def\xister@dbg@dim##1%
+    \protected\long\def\xister@dbg@msg##1%
       {%
-        \xister@dbg
-          {Trying to use dimension `\unexpanded{##1}'}%
-          {\dimexpr##1\relax}%
+        \begingroup
+          \newlinechar`\^^J
+          \message{##1}%
+        \endgroup
       }%
-    \protected\long\def\xister@dbg@div##1%
-      {%
-        \xister@dbg
-          {Trying to use divisor `\unexpanded{##1}'}%
-          {\dimexpr\z@##1\relax}%
-      }%
-    \protected\long\def\xister@dbg@float##1%
-      {\xister@dbg{Trying to use float `\unexpanded{##1}'}{##1\z@}}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1237,13 +1264,6 @@ and the derived files           xistercian.pdf
 \protected\ekvdefNoVal{xister}{r} {\cistercianredrawlazy}
 \ekvletkvNoVal{xister}{redraw} {xister}{r}
 \ekvletkvNoVal{xister}{redraw!}{xister}{r!}
-%    \end{macrocode}
-%
-% The |debug| option is only available as a package option, we let it throw an
-% error:
-%    \begin{macrocode}
-\ekvdefNoVal{xister}{debug}
-  {\PackageError{xistercian}{`debug' is only available as a load time option}{}}
 %    \end{macrocode}
 %
 %
@@ -1868,26 +1888,17 @@ and the derived files           xistercian.pdf
 %   specified in \cs[no-index]{xister@fontfeatures}).
 %   If all these font features match with whatever was active when we last built
 %   the glyphs we do nothing, else we rebuild them.
-%
-%   The |\edef| is just used to remove the |debug| code if it isn't necessary.
 %    \begin{macrocode}
-\protected\edef\xister@ensure@current
+\protected\def\xister@ensure@current
   {%
-    \unexpanded{\edef\xister@tmp{\xister@fontfeatures}}%
-    \unexpanded{\unless\ifx\xister@tmp\xister@last@font}%
-      \ifxister@dbg@
-        \unexpanded
-          {\xister@dbg@do{Font changed. Building glyphs for \xister@tmp}}%
-      \fi
-    \unexpanded
-      {%
-          \let\xister@last@font\xister@tmp
-          \xister@build
-      }%
-      \ifxister@dbg@
-        \unexpanded{\xister@dbg@done}%
-      \fi
-    \unexpanded{\fi}%
+    \edef\xister@tmp{\xister@fontfeatures}%
+    \ifx\xister@tmp\xister@last@font
+    \else
+      \xister@dbg@do{Font changed. Building glyphs for \xister@tmp}%
+        \let\xister@last@font\xister@tmp
+        \xister@build
+      \xister@dbg@done
+    \fi
   }
 \AtBeginDocument{\xister@ensure@current}
 %    \end{macrocode}
